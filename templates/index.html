@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>卡路里食物分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <header>
+        <h1>卡路里食物分析</h1>
+    </header>
+
+    <!-- 上传区域 -->
+    <section id="uploadArea" class="upload-area">
+        <p>点击或拖拽图片到此处上传</p>
+        <input type="file" id="imageInput" accept="image/*" hidden />
+    </section>
+
+    <!-- 图片预览区域 -->
+    <section id="imagePreview" class="image-preview" style="display:none;">
+        <img id="previewImg" alt="预览"/>
+        <button id="removeImage" type="button">移除图片</button>
+    </section>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+        <button id="analyzeBtn" class="analyze-btn" disabled>
+            <span class="btn-text">分析卡路里</span>
+            <span class="loading-spinner" style="display:none;"></span>
+        </button>
+        <button id="historyToggleBtn" class="history-toggle-btn">历史记录</button>
+    </div>
+
+    <!-- 结果显示区域 -->
+    <section id="resultSection" class="result-section" style="display:none;">
+        <h2>分析结果</h2>
+        <pre id="resultContent"></pre>
+        <div id="usageInfo" class="usage-info"></div>
+    </section>
+
+    <!-- 错误信息显示 -->
+    <section id="errorSection" class="error-section" style="display:none;">
+        <p id="errorMessage"></p>
+    </section>
+
+    <!-- 历史记录区域 -->
+    <section id="historyContent" class="history-content" style="display:none;">
+        <div class="history-header">
+            <h2>历史记录</h2>
+            <button id="clearHistoryBtn" type="button">清空历史</button>
+        </div>
+        <p id="historyEmpty">暂无记录</p>
+        <ul id="historyList" class="history-list"></ul>
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
