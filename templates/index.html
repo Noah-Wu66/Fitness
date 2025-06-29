@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI卡路里计算器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍎 AI卡路里计算器</h1>
+            <p>上传食物照片，AI智能分析卡路里含量</p>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-text">点击或拖拽上传食物照片</p>
+                        <p class="upload-hint">支持 PNG、JPG、JPEG、GIF、BMP、WEBP 格式，最大20MB</p>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <div class="image-preview" id="imagePreview" style="display: none;">
+                    <img id="previewImg" src="" alt="预览图片">
+                    <button class="remove-btn" id="removeImage">✕</button>
+                </div>
+                
+                <button class="analyze-btn" id="analyzeBtn" disabled>
+                    <span class="btn-text">分析卡路里</span>
+                    <div class="loading-spinner" style="display: none;"></div>
+                </button>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h2>🔍 分析结果</h2>
+                <div class="result-content" id="resultContent"></div>
+                <div class="usage-info" id="usageInfo"></div>
+            </div>
+
+            <div class="error-section" id="errorSection" style="display: none;">
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>📝 分析历史</h2>
+                    <div class="history-controls">
+                        <button class="history-toggle-btn" id="historyToggleBtn">查看历史</button>
+                        <button class="clear-history-btn" id="clearHistoryBtn">清空历史</button>
+                    </div>
+                </div>
+                
+                <div class="history-content" id="historyContent" style="display: none;">
+                    <div class="history-empty" id="historyEmpty" style="display: none;">
+                        <p>暂无分析历史</p>
+                    </div>
+                    <div class="history-list" id="historyList"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>由 Gemini 2.5 Pro 强力驱动</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
