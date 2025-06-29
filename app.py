@@ -42,13 +42,32 @@ def analyze_calories():
         
         # 读取图片数据
         file_bytes = file.read()
-        
-        # 检查文件大小
+
+        # --- 图片压缩处理 ---
+        # 为了减少调用 Gemini API 的耗时与流量，这里将图片最长边压缩到 1024px，
+        # 并统一保存为 JPEG(质量85)。若图片本身尺寸已足够小，则不会变更尺寸。
+        try:
+            img = Image.open(io.BytesIO(file_bytes))
+            max_dim = 1024
+            if img.width > max_dim or img.height > max_dim:
+                img.thumbnail((max_dim, max_dim))
+
+            # 转成 RGB 以避免透明通道造成文件体积过大
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=85)
+            file_bytes = buf.getvalue()
+        except Exception as img_err:
+            print(f"图片压缩失败: {img_err}")
+
+        # 再次检查文件大小（压缩后理论上不会超过20MB，但这里仍做保护）
         if len(file_bytes) > 20 * 1024 * 1024:  # 20MB
             return jsonify({'error': '图片文件过大，请上传小于20MB的图片'}), 400
-        
-        # 获取MIME类型
-        mime_type = f"image/{file_extension}" if file_extension != 'jpg' else "image/jpeg"
+
+        # 统一 MIME 类型为 JPEG
+        mime_type = "image/jpeg"
         
         # 调用Gemini API进行分析
         response = client.models.generate_content(

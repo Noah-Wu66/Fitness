@@ -126,7 +126,14 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(async response => {
+            // 如果服务器返回非 2xx 状态，尝试读取文本并抛出错误
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+            return response.json();
+        })
         .then(data => {
             setLoading(false);
             if (data.success) {
@@ -138,7 +145,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             setLoading(false);
             console.error('Error:', error);
-            showError('网络错误，请检查网络连接后重试');
+            // 根据错误信息判断是否是网关或网络错误
+            if (String(error).includes('HTTP 502')) {
+                showError('服务器超时或暂不可用，请稍后再试');
+            } else {
+                showError('网络错误，请检查网络连接后重试');
+            }
         });
     }
 
