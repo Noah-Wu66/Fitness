@@ -20,4 +20,4 @@ ENV PORT=5000
 EXPOSE $PORT
 
 # 使用 Gunicorn 启动 Flask 应用
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"] 
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-${WEB_PORT:-5000}} app:app"] 

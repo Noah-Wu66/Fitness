@@ -109,4 +109,6 @@ if __name__ == '__main__':
         print("错误: 请设置 GEMINI_BASE_URL 环境变量")
         exit(1)
     
-    app.run(host='0.0.0.0', port=5000) 
+    # 根据部署环境动态选择端口，优先 PORT，其次 WEB_PORT，默认 5000
+    run_port = int(os.getenv('PORT') or os.getenv('WEB_PORT') or "5000")
+    app.run(host='0.0.0.0', port=run_port) 
