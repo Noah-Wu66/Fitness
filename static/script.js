@@ -195,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let foodName = '';
         let calories = '';
         let calorieLevel = '';
+        let weight = '';
         let carb = '';
         let protein = '';
         let fat = '';
@@ -208,6 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 calories = trimmedLine.replace('热量：', '').trim();
             } else if (trimmedLine.startsWith('热量等级：')) {
                 calorieLevel = trimmedLine.replace('热量等级：', '').trim();
+            } else if (trimmedLine.startsWith('重量：')) {
+                weight = trimmedLine.replace('重量：', '').trim();
             } else if (trimmedLine.startsWith('碳水：')) {
                 carb = trimmedLine.replace('碳水：', '').trim();
             } else if (trimmedLine.startsWith('蛋白质：')) {
@@ -238,6 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="calorie-number">${calories.replace(' 千卡', '')}</div>
                     <div class="calorie-unit">千卡</div>
                 </div>
+                ${weight ? `<div class="weight-display">重量：${weight}</div>` : ''}
                 
                 <div class="nutrition-grid">
                     <div class="nutrition-item">
@@ -367,10 +371,15 @@ document.addEventListener('DOMContentLoaded', function() {
         historyVisible = !historyVisible;
         if (historyVisible) {
             historyCard.style.display = 'block';
+            // 打开侧边栏
+            historyCard.classList.add('open');
+            document.body.classList.add('history-open');
             historyToggleBtn.innerHTML = '<span>📝</span>隐藏记录';
             loadHistory();
         } else {
-            historyCard.style.display = 'none';
+            historyCard.classList.remove('open');
+            document.body.classList.remove('history-open');
+            historyCard.style.display = 'block';  // 维持block，靠transform隐藏
             historyToggleBtn.innerHTML = '<span>📝</span>历史记录';
         }
     }

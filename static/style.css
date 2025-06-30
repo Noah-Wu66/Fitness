@@ -392,6 +392,23 @@ body {
     border-radius: var(--radius-lg);
     padding: 0;
     margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.food-analysis-card .food-header {
+    grid-column: 1 / -1;
+    margin-bottom: 16px;
+}
+
+.food-analysis-card .calorie-display,
+.food-analysis-card .nutrition-grid {
+    margin-bottom: 0;
+}
+
+.food-analysis-card .food-suggestion {
+    grid-column: 1 / -1;
 }
 
 .food-header {
@@ -756,6 +773,10 @@ body {
         align-items: flex-start;
         gap: 8px;
     }
+    
+    .food-analysis-card {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -811,4 +832,56 @@ body {
         padding: 12px 16px;
         font-size: 13px;
     }
+    
+    #historyCard {
+        width: 100%;
+    }
+}
+
+/* ===================== 新增：历史记录侧边栏 ===================== */
+#historyCard {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 360px;
+    max-width: 90%;
+    height: 100%;
+    overflow-y: auto;
+    background: var(--card-background);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid var(--border-color);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+#historyCard.open {
+    transform: translateX(0);
+}
+
+/* 侧边栏内部卡头与内容保持原来排版 */
+#historyCard .card-header {
+    position: sticky;
+    top: 0;
+    background: var(--card-background);
+    z-index: 10;
+}
+
+/* 当侧边栏打开时，防止背景滚动 */
+body.history-open {
+    overflow: hidden;
+}
+
+/* 历史按钮吸附右侧，增加层级以免被遮挡 */
+.history-btn {
+    position: relative;
+    z-index: 1100;
+}
+
+/* 营养展示之后 */
+.food-analysis-card .weight-display {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 8px 0 0 0;
+    text-align: center;
 } 
