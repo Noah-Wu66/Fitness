@@ -222,53 +222,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // 如果解析失败，返回原始文本
+        // 如果解析失败，尝试更灵活的解析
         if (!foodName && !calories) {
-            return `<pre style="margin: 0;">${analysis}</pre>`;
+            // 尝试更宽松的匹配
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (trimmedLine.includes('食物') && trimmedLine.includes('：')) {
+                    foodName = trimmedLine.split('：')[1]?.trim() || '';
+                } else if (trimmedLine.includes('热量') && trimmedLine.includes('：')) {
+                    calories = trimmedLine.split('：')[1]?.trim() || '';
+                } else if (trimmedLine.includes('等级') && trimmedLine.includes('：')) {
+                    calorieLevel = trimmedLine.split('：')[1]?.trim() || '';
+                }
+            });
         }
 
-        // 生成格式化的HTML
+        // 如果还是解析失败，返回简化的原始文本
+        if (!foodName && !calories) {
+            return `<div class="compact-result"><pre style="margin: 0; font-size: 14px; line-height: 1.5;">${analysis}</pre></div>`;
+        }
+
+        // 提取数字
+        const calorieNum = calories.replace(/[^\d]/g, '') || '0';
         const levelBadgeClass = getLevelBadgeClass(calorieLevel);
         
         return `
-            <div class="food-analysis-card">
-                <div class="food-header">
-                    <h3 class="food-name">${foodName}</h3>
-                    <span class="calorie-badge ${levelBadgeClass}">${calorieLevel}</span>
-                </div>
-                
-                <div class="calorie-display">
-                    <div class="calorie-number">${calories.replace(' 千卡', '')}</div>
-                    <div class="calorie-unit">千卡</div>
-                </div>
-                ${weight ? `<div class="weight-display">重量：${weight}</div>` : ''}
-                
-                <div class="nutrition-grid">
-                    <div class="nutrition-item">
-                        <div class="nutrition-label">
-                            <span class="nutrition-dot carb"></span>
-                            碳水
-                        </div>
-                        <div class="nutrition-value">${carb}</div>
+            <div class="compact-food-card">
+                <div class="compact-header">
+                    <div class="food-info">
+                        <h4 class="compact-food-name">${foodName}</h4>
+                        ${weight ? `<span class="compact-weight">${weight}</span>` : ''}
                     </div>
-                    <div class="nutrition-item">
-                        <div class="nutrition-label">
-                            <span class="nutrition-dot protein"></span>
-                            蛋白质
-                        </div>
-                        <div class="nutrition-value">${protein}</div>
-                    </div>
-                    <div class="nutrition-item">
-                        <div class="nutrition-label">
-                            <span class="nutrition-dot fat"></span>
-                            脂肪
-                        </div>
-                        <div class="nutrition-value">${fat}</div>
+                    <div class="compact-calorie">
+                        <span class="calorie-number">${calorieNum}</span>
+                        <span class="calorie-unit">千卡</span>
+                        <span class="level-badge ${levelBadgeClass}">${calorieLevel}</span>
                     </div>
                 </div>
                 
-                ${suggestion ? `<div class="food-suggestion">
-                    <strong>食用建议：</strong>${suggestion}
+                <div class="compact-nutrition">
+                    <div class="nutrition-item">
+                        <span class="nutrition-dot carb"></span>
+                        <span class="nutrition-label">碳水</span>
+                        <span class="nutrition-value">${carb}</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-dot protein"></span>
+                        <span class="nutrition-label">蛋白质</span>
+                        <span class="nutrition-value">${protein}</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-dot fat"></span>
+                        <span class="nutrition-label">脂肪</span>
+                        <span class="nutrition-value">${fat}</span>
+                    </div>
+                </div>
+                
+                ${suggestion ? `<div class="compact-suggestion">
+                    💡 ${suggestion}
                 </div>` : ''}
             </div>
         `;
