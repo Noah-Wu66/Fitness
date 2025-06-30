@@ -103,18 +103,6 @@ body {
     transition: all 0.2s ease;
 }
 
-.upload-card,
-.result-card,
-.error-card,
-.history-card {
-    @extend .card;
-    background: var(--card-background);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    transition: all 0.2s ease;
-}
-
 .card-header {
     display: flex;
     align-items: center;
