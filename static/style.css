@@ -6,9 +6,10 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffffff;
     min-height: 100vh;
     color: #333;
+    line-height: 1.6;
 }
 
 .container {
@@ -19,26 +20,27 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 40px;
-    color: white;
+    margin-bottom: 50px;
+    padding: 30px 0;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 header h1 {
     font-size: 2.5em;
     margin-bottom: 10px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: #2c3e50;
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
 
 header p {
     font-size: 1.1em;
-    opacity: 0.9;
+    color: #7f8c8d;
 }
 
 main {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+    max-width: 100%;
 }
 
 .upload-section {
@@ -46,8 +48,8 @@ main {
 }
 
 .upload-area {
-    border: 3px dashed #ddd;
-    border-radius: 15px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 12px;
     padding: 60px 20px;
     text-align: center;
     cursor: pointer;
@@ -56,99 +58,126 @@ main {
 }
 
 .upload-area:hover {
-    border-color: #667eea;
-    background: #f0f2ff;
+    border-color: #3498db;
+    background: #f8f9fa;
 }
 
 .upload-area.dragover {
-    border-color: #667eea;
-    background: #e8edff;
-    transform: scale(1.02);
+    border-color: #3498db;
+    background: #e3f2fd;
 }
 
 .upload-content .upload-icon {
-    font-size: 4em;
+    font-size: 3em;
     margin-bottom: 20px;
+    color: #bdc3c7;
 }
 
 .upload-text {
     font-size: 1.2em;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 10px;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 8px;
 }
 
 .upload-hint {
-    color: #888;
+    color: #95a5a6;
     font-size: 0.9em;
 }
 
 .image-preview {
     position: relative;
-    margin: 20px 0;
+    margin: 30px 0;
     text-align: center;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fafafa;
 }
 
 .image-preview img {
     max-width: 100%;
     max-height: 400px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
 }
 
 .remove-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255, 0, 0, 0.8);
+    top: 25px;
+    right: 25px;
+    background: #e74c3c;
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.3s ease;
 }
 
 .remove-btn:hover {
-    background: rgba(255, 0, 0, 1);
+    background: #c0392b;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 30px 0;
 }
 
 .analyze-btn {
-    width: 100%;
-    padding: 18px;
+    flex: 1;
+    padding: 16px 24px;
     border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    background: #3498db;
     color: white;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-height: 56px;
+    min-height: 52px;
 }
 
 .analyze-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: #2980b9;
 }
 
 .analyze-btn:disabled {
-    background: #ccc;
+    background: #bdc3c7;
     cursor: not-allowed;
-    transform: none;
+}
+
+.history-toggle-btn {
+    padding: 16px 24px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #2c3e50;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.history-toggle-btn:hover {
+    background: #f8f9fa;
+    border-color: #3498db;
 }
 
 .loading-spinner {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: white;
@@ -160,17 +189,18 @@ main {
 }
 
 .result-section {
-    margin-top: 30px;
+    margin-top: 40px;
     padding: 30px;
-    background: #f8f9ff;
-    border-radius: 15px;
-    border-left: 5px solid #667eea;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
 }
 
 .result-section h2 {
-    color: #667eea;
+    color: #2c3e50;
     margin-bottom: 20px;
-    font-size: 1.5em;
+    font-size: 1.4em;
+    font-weight: 600;
 }
 
 .result-content {
@@ -178,114 +208,112 @@ main {
     color: #555;
     white-space: pre-wrap;
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    font-size: 0.95em;
 }
 
 .usage-info {
-    margin-top: 15px;
-    padding: 15px;
-    background: rgba(102, 126, 234, 0.1);
+    margin-top: 20px;
+    padding: 16px;
+    background: #e3f2fd;
     border-radius: 8px;
     font-size: 0.9em;
-    color: #666;
+    color: #2c3e50;
+    border: 1px solid #bbdefb;
 }
 
 .error-section {
-    margin-top: 30px;
-    padding: 20px;
-    background: #ffe6e6;
-    border-radius: 15px;
-    border-left: 5px solid #ff4757;
+    margin-top: 40px;
+    padding: 24px;
+    background: #ffebee;
+    border-radius: 12px;
+    border: 1px solid #ffcdd2;
 }
 
 .error-message {
-    color: #d63031;
+    color: #d32f2f;
     font-weight: 500;
 }
 
 /* 历史记录样式 */
 .history-section {
-    margin-top: 40px;
-    border-top: 2px solid #f0f0f0;
-    padding-top: 30px;
+    margin-top: 50px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 40px;
 }
 
 .history-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     flex-wrap: wrap;
     gap: 15px;
 }
 
 .history-header h2 {
-    color: #667eea;
-    font-size: 1.5em;
+    color: #2c3e50;
+    font-size: 1.4em;
     margin: 0;
+    font-weight: 600;
 }
 
 .history-controls {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
-.history-toggle-btn, .clear-history-btn {
-    padding: 8px 16px;
-    border: none;
+.clear-history-btn {
+    padding: 10px 20px;
+    border: 1px solid #e74c3c;
     border-radius: 6px;
+    background: #ffffff;
+    color: #e74c3c;
     font-size: 0.9em;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.history-toggle-btn {
-    background: #667eea;
-    color: white;
-}
-
-.history-toggle-btn:hover {
-    background: #5a67d8;
-}
-
-.clear-history-btn {
-    background: #ff6b6b;
-    color: white;
-}
-
 .clear-history-btn:hover {
-    background: #ff5252;
+    background: #e74c3c;
+    color: white;
 }
 
 .history-content {
-    background: #f8f9ff;
-    border-radius: 15px;
-    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 25px;
     max-height: 600px;
     overflow-y: auto;
+    border: 1px solid #e9ecef;
 }
 
 .history-empty {
     text-align: center;
-    color: #888;
-    padding: 40px 20px;
+    color: #95a5a6;
+    padding: 50px 20px;
     font-style: italic;
+    font-size: 1.1em;
+}
+
+.history-list {
+    list-style: none;
 }
 
 .history-item {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
 }
 
 .history-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: #3498db;
 }
 
 .history-item:last-child {
@@ -296,86 +324,97 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
 }
 
 .history-date {
-    color: #667eea;
-    font-weight: 600;
-    font-size: 0.95em;
+    color: #7f8c8d;
+    font-weight: 500;
+    font-size: 0.9em;
 }
 
 .history-delete {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
+    background: #ffffff;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+    border-radius: 5px;
+    padding: 6px 12px;
     font-size: 0.8em;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .history-delete:hover {
-    background: #ff5252;
+    background: #e74c3c;
+    color: white;
 }
 
 .history-image-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .history-image {
     max-width: 200px;
     max-height: 150px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .history-image:hover {
-    transform: scale(1.05);
+    border-color: #3498db;
 }
 
 .history-result {
-    background: #f9f9f9;
-    padding: 15px;
+    background: #f8f9fa;
+    padding: 18px;
     border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 0.95em;
+    margin-bottom: 15px;
+    font-size: 0.9em;
     line-height: 1.6;
     white-space: pre-wrap;
     max-height: 200px;
     overflow-y: auto;
+    border: 1px solid #e9ecef;
+    color: #2c3e50;
 }
 
 .history-usage {
     font-size: 0.85em;
-    color: #666;
-    background: rgba(102, 126, 234, 0.1);
-    padding: 8px 12px;
+    color: #555;
+    background: #e3f2fd;
+    padding: 12px 16px;
     border-radius: 6px;
+    border: 1px solid #bbdefb;
 }
 
 footer {
     text-align: center;
-    margin-top: 40px;
-    color: rgba(255, 255, 255, 0.8);
+    margin-top: 60px;
+    padding: 30px 0;
+    color: #95a5a6;
     font-size: 0.9em;
+    border-top: 1px solid #f0f0f0;
 }
 
 @media (max-width: 600px) {
     .container {
-        padding: 10px;
+        padding: 15px;
     }
     
     main {
-        padding: 20px;
-        border-radius: 15px;
+        padding: 0;
+    }
+    
+    header {
+        padding: 20px 0;
+        margin-bottom: 30px;
     }
     
     header h1 {
@@ -387,7 +426,11 @@ footer {
     }
     
     .upload-content .upload-icon {
-        font-size: 3em;
+        font-size: 2.5em;
+    }
+
+    .action-buttons {
+        flex-direction: column;
     }
 
     .history-header {
@@ -407,7 +450,7 @@ footer {
     .history-item-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
     }
 
     .history-date {
@@ -416,11 +459,19 @@ footer {
 
     .history-delete {
         align-self: center;
-        padding: 6px 12px;
+        padding: 8px 16px;
     }
 
     .history-image {
         max-width: 150px;
         max-height: 120px;
+    }
+
+    .result-section, .error-section {
+        padding: 20px;
+    }
+
+    .result-content {
+        padding: 18px;
     }
 } 
