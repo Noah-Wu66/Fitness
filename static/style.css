@@ -876,110 +876,217 @@ body.history-open {
 
 /* 紧凑食物分析卡片 */
 .compact-food-card {
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border-radius: var(--radius-xl);
     padding: 24px;
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.compact-food-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
 .compact-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.food-info {
+    flex: 1;
 }
 
 .compact-food-name {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     color: var(--text-primary);
-    margin: 0;
-    line-height: 1.4;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
 }
 
 .compact-weight {
     font-size: 14px;
     color: var(--text-secondary);
-    margin-top: 2px;
+    background: var(--background);
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 500;
+    display: inline-block;
 }
 
 .compact-calorie {
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
 }
 
 .calorie-main {
     display: flex;
     align-items: baseline;
-    gap: 4px;
-    justify-content: flex-end;
+    gap: 6px;
 }
 
 .compact-calorie .calorie-number {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 36px;
+    font-weight: 800;
     color: var(--primary-color);
     line-height: 1;
+    text-shadow: 0 1px 2px rgba(30, 144, 255, 0.1);
 }
 
 .compact-calorie .calorie-unit {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-secondary);
-    font-weight: 500;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
 .level-badge {
-    font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-weight: 500;
-    margin-top: 4px;
-    display: inline-block;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.level-badge.level-low {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #166534;
+}
+
+.level-badge.level-medium {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+}
+
+.level-badge.level-high {
+    background: linear-gradient(135deg, #fed7aa, #fdba74);
+    color: #c2410c;
+}
+
+.level-badge.level-extreme {
+    background: linear-gradient(135deg, #fecaca, #fca5a5);
+    color: #991b1b;
 }
 
 .compact-nutrition {
     display: flex;
     justify-content: space-between;
-    margin: 20px 0;
-    padding: 16px 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+    margin: 24px 0 20px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid #e2e8f0;
 }
 
 .compact-nutrition .nutrition-item {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-direction: column;
+    text-align: center;
+}
+
+.compact-nutrition .nutrition-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.compact-nutrition .nutrition-dot.carb { 
+    background: linear-gradient(135deg, #10B981, #059669);
+}
+
+.compact-nutrition .nutrition-dot.protein { 
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+}
+
+.compact-nutrition .nutrition-dot.fat { 
+    background: linear-gradient(135deg, #F59E0B, #D97706);
 }
 
 .compact-nutrition .nutrition-label {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-secondary);
+    font-weight: 600;
+    margin-top: 4px;
 }
 
 .compact-nutrition .nutrition-value {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 700;
     color: var(--text-primary);
+    margin-top: 2px;
 }
 
 .compact-suggestion {
-    padding: 0;
-    font-size: 13px;
-    color: var(--text-secondary);
+    padding: 16px 16px 16px 48px;
+    font-size: 14px;
+    color: var(--text-primary);
     line-height: 1.5;
-    text-align: center;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-lg);
+    position: relative;
+}
+
+.compact-suggestion::before {
+    content: '💡';
+    position: absolute;
+    left: 16px;
+    top: 16px;
+}
+
+.compact-result {
+    background: var(--card-background);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 @media (max-width: 640px) {
     .compact-nutrition {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .compact-nutrition .nutrition-item {
+        flex-direction: row;
+        text-align: left;
     }
     
     .compact-header {
+        flex-direction: column;
+        gap: 16px;
         align-items: flex-start;
     }
-} 
+    
+    .compact-calorie {
+        align-self: flex-start;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 12px;
+    }
+    
+         .compact-calorie .calorie-number {
+         font-size: 28px;
+     }
+ } 

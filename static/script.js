@@ -265,23 +265,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="compact-nutrition">
                     <div class="nutrition-item">
                         <span class="nutrition-dot carb"></span>
-                        <span class="nutrition-label">碳水</span>
-                        <span class="nutrition-value">${carb}</span>
+                        <div class="nutrition-label">碳水</div>
+                        <div class="nutrition-value">${carb}</div>
                     </div>
                     <div class="nutrition-item">
                         <span class="nutrition-dot protein"></span>
-                        <span class="nutrition-label">蛋白质</span>
-                        <span class="nutrition-value">${protein}</span>
+                        <div class="nutrition-label">蛋白质</div>
+                        <div class="nutrition-value">${protein}</div>
                     </div>
                     <div class="nutrition-item">
                         <span class="nutrition-dot fat"></span>
-                        <span class="nutrition-label">脂肪</span>
-                        <span class="nutrition-value">${fat}</span>
+                        <div class="nutrition-label">脂肪</div>
+                        <div class="nutrition-value">${fat}</div>
                     </div>
                 </div>
                 
                 ${suggestion ? `<div class="compact-suggestion">
-                    💡 ${suggestion}
+                    ${suggestion}
                 </div>` : ''}
             </div>
         `;
