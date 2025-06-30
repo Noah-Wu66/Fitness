@@ -167,25 +167,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showResult(analysis, usage) {
-        // 尝试解析并格式化分析结果
         const formattedResult = formatAnalysisResult(analysis);
         resultContent.innerHTML = formattedResult;
         
-        // 显示token使用情况
-        usageInfo.innerHTML = `
-            <strong>Token使用情况:</strong> 
-            输入: ${usage.prompt_tokens} | 
-            输出: ${usage.completion_tokens} | 
-            总计: ${usage.total_tokens}
-        `;
+        // 隐藏或移除token使用信息显示
+        if (typeof usageInfo !== 'undefined') {
+            const infoEl = document.getElementById('usageInfo');
+            if (infoEl) infoEl.style.display = 'none';
+        }
         
         resultCard.style.display = 'block';
         errorCard.style.display = 'none';
         
-        // 保存到历史记录
         saveToHistory(analysis, usage);
         
-        // 平滑滚动到结果区域
         resultCard.scrollIntoView({ behavior: 'smooth' });
     }
 
