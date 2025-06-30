@@ -254,8 +254,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${weight ? `<span class="compact-weight">${weight}</span>` : ''}
                     </div>
                     <div class="compact-calorie">
-                        <span class="calorie-number">${calorieNum}</span>
-                        <span class="calorie-unit">千卡</span>
+                        <div class="calorie-main">
+                            <span class="calorie-number">${calorieNum}</span>
+                            <span class="calorie-unit">千卡</span>
+                        </div>
                         <span class="level-badge ${levelBadgeClass}">${calorieLevel}</span>
                     </div>
                 </div>
