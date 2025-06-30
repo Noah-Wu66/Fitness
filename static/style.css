@@ -1091,251 +1091,171 @@ body.history-open {
      }
  }
 
-/* 现代化分析结果样式 */
-.modern-analysis-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 24px;
+/* PC端紧凑分析结果样式 */
+.pc-analysis-result {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px 20px;
     margin: 0;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
 }
 
-.modern-analysis-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.pc-analysis-result:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
 }
 
-/* 主要信息区域 */
-.analysis-main {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    gap: 16px;
+/* 主要内容行 */
+.result-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr 3fr;
+    gap: 20px;
+    align-items: center;
+    min-height: 60px;
 }
 
-.food-section {
-    flex: 1;
-    min-width: 0;
-}
-
-.modern-food-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 4px 0;
-    line-height: 1.3;
-    word-break: break-word;
-}
-
-.modern-weight {
-    display: inline-block;
-    background: #f1f5f9;
-    color: #475569;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-}
-
-.calorie-section {
+/* 食物信息区域 */
+.food-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
+    gap: 4px;
 }
 
-.calorie-display {
+.food-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.food-weight {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+}
+
+/* 卡路里信息区域 */
+.calorie-info {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: center;
     gap: 4px;
 }
 
 .calorie-number {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 800;
     color: var(--primary-color);
     line-height: 1;
 }
 
 .calorie-unit {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 12px;
     color: var(--text-secondary);
+    margin-left: 4px;
 }
 
-.modern-level-badge {
-    font-size: 12px;
+.calorie-badge {
+    font-size: 10px;
     font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 2px 6px;
+    border-radius: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.modern-level-badge.level-low {
+.calorie-badge.level-low {
     background: #dcfce7;
     color: #166534;
-    border: 1px solid #bbf7d0;
 }
 
-.modern-level-badge.level-medium {
+.calorie-badge.level-medium {
     background: #fef3c7;
     color: #92400e;
-    border: 1px solid #fde68a;
 }
 
-.modern-level-badge.level-high {
+.calorie-badge.level-high {
     background: #fee2e2;
     color: #991b1b;
-    border: 1px solid #fecaca;
 }
 
-.modern-level-badge.level-extreme {
+.calorie-badge.level-extreme {
     background: #fdf2f8;
     color: #be185d;
-    border: 1px solid #fbcfe8;
 }
 
-/* 营养成分条 */
-.nutrition-bar {
+/* 营养成分内联显示 */
+.nutrition-inline {
     display: flex;
-    gap: 0;
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 4px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-.nutrition-bar .nutrition-item {
-    flex: 1;
-    margin: 0;
-}
-
-.nutrition-content {
+.nutrition-inline .nutrition-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 12px 8px;
-    border-radius: 8px;
-    transition: all 0.15s ease;
-    cursor: default;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
 }
 
-.nutrition-content:hover {
-    background: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.nutrition-bar .nutrition-dot {
-    width: 8px;
-    height: 8px;
+.nutrition-inline .nutrition-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    margin-bottom: 6px;
-    border: none;
+    flex-shrink: 0;
 }
 
-.nutrition-bar .nutrition-dot.carb { 
+.nutrition-inline .nutrition-dot.carb { 
     background: #10b981;
 }
 
-.nutrition-bar .nutrition-dot.protein { 
+.nutrition-inline .nutrition-dot.protein { 
     background: #ef4444;
 }
 
-.nutrition-bar .nutrition-dot.fat { 
+.nutrition-inline .nutrition-dot.fat { 
     background: #f59e0b;
 }
 
-.nutrition-bar .nutrition-label {
+.nutrition-text {
     font-size: 12px;
-    font-weight: 500;
     color: var(--text-secondary);
-    margin-bottom: 2px;
-    text-align: center;
+    white-space: nowrap;
 }
 
-.nutrition-bar .nutrition-value {
-    font-size: 14px;
-    font-weight: 600;
+.nutrition-text strong {
     color: var(--text-primary);
-    text-align: center;
+    font-weight: 600;
 }
 
-/* 建议区域 */
-.modern-suggestion {
+/* 建议内联显示 */
+.suggestion-inline {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 14px;
-    line-height: 1.4;
-    color: #0c4a6e;
+    padding: 8px 12px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
 }
 
 .suggestion-icon {
+    font-size: 14px;
     flex-shrink: 0;
-    margin-top: 1px;
-    color: #0284c7;
 }
 
-.modern-suggestion span {
+.suggestion-text {
+    font-size: 13px;
+    color: #1e40af;
     font-weight: 500;
-}
-
-/* 响应式设计 */
-@media (max-width: 640px) {
-    .modern-analysis-card {
-        padding: 20px;
-        border-radius: 12px;
-    }
-    
-    .analysis-main {
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 16px;
-    }
-    
-    .calorie-section {
-        align-items: flex-start;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    
-    .modern-food-name {
-        font-size: 18px;
-    }
-    
-    .calorie-number {
-        font-size: 24px;
-    }
-    
-    .nutrition-bar {
-        gap: 2px;
-        padding: 3px;
-    }
-    
-    .nutrition-content {
-        padding: 10px 6px;
-    }
-    
-    .nutrition-bar .nutrition-label {
-        font-size: 11px;
-    }
-    
-    .nutrition-bar .nutrition-value {
-        font-size: 13px;
-    }
-    
-    .modern-suggestion {
-        padding: 10px 12px;
-        font-size: 13px;
-    }
+    line-height: 1.3;
 } 
