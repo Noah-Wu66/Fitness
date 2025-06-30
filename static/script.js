@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 如果还是解析失败，返回简化的原始文本
         if (!foodName && !calories) {
-            return `<div class="compact-result"><pre style="margin: 0; font-size: 14px; line-height: 1.5;">${analysis}</pre></div>`;
+            return `<div class="modern-result"><pre style="margin: 0; font-size: 14px; line-height: 1.5;">${analysis}</pre></div>`;
         }
 
         // 提取数字
@@ -247,41 +247,51 @@ document.addEventListener('DOMContentLoaded', function() {
         const levelBadgeClass = getLevelBadgeClass(calorieLevel);
         
         return `
-            <div class="compact-food-card">
-                <div class="compact-header">
-                    <div class="food-info">
-                        <h4 class="compact-food-name">${foodName}</h4>
-                        ${weight ? `<span class="compact-weight">${weight}</span>` : ''}
+            <div class="modern-analysis-card">
+                <div class="analysis-main">
+                    <div class="food-section">
+                        <h3 class="modern-food-name">${foodName}</h3>
+                        ${weight ? `<span class="modern-weight">${weight}</span>` : ''}
                     </div>
-                    <div class="compact-calorie">
-                        <div class="calorie-main">
+                    
+                    <div class="calorie-section">
+                        <div class="calorie-display">
                             <span class="calorie-number">${calorieNum}</span>
                             <span class="calorie-unit">千卡</span>
                         </div>
-                        <span class="level-badge ${levelBadgeClass}">${calorieLevel}</span>
+                        <span class="modern-level-badge ${levelBadgeClass}">${calorieLevel}</span>
                     </div>
                 </div>
                 
-                <div class="compact-nutrition">
+                <div class="nutrition-bar">
                     <div class="nutrition-item">
-                        <span class="nutrition-dot carb"></span>
-                        <div class="nutrition-label">碳水</div>
-                        <div class="nutrition-value">${carb}</div>
+                        <div class="nutrition-content">
+                            <span class="nutrition-dot carb"></span>
+                            <span class="nutrition-label">碳水</span>
+                            <span class="nutrition-value">${carb}</span>
+                        </div>
                     </div>
                     <div class="nutrition-item">
-                        <span class="nutrition-dot protein"></span>
-                        <div class="nutrition-label">蛋白质</div>
-                        <div class="nutrition-value">${protein}</div>
+                        <div class="nutrition-content">
+                            <span class="nutrition-dot protein"></span>
+                            <span class="nutrition-label">蛋白质</span>
+                            <span class="nutrition-value">${protein}</span>
+                        </div>
                     </div>
                     <div class="nutrition-item">
-                        <span class="nutrition-dot fat"></span>
-                        <div class="nutrition-label">脂肪</div>
-                        <div class="nutrition-value">${fat}</div>
+                        <div class="nutrition-content">
+                            <span class="nutrition-dot fat"></span>
+                            <span class="nutrition-label">脂肪</span>
+                            <span class="nutrition-value">${fat}</span>
+                        </div>
                     </div>
                 </div>
                 
-                ${suggestion ? `<div class="compact-suggestion">
-                    ${suggestion}
+                ${suggestion ? `<div class="modern-suggestion">
+                    <svg class="suggestion-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>${suggestion}</span>
                 </div>` : ''}
             </div>
         `;
