@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewImg = document.getElementById('previewImg');
     const removeImage = document.getElementById('removeImage');
     const analyzeBtn = document.getElementById('analyzeBtn');
-    const resultSection = document.getElementById('resultSection');
+    const resultCard = document.getElementById('resultCard');
     const resultContent = document.getElementById('resultContent');
     const usageInfo = document.getElementById('usageInfo');
-    const errorSection = document.getElementById('errorSection');
+    const errorCard = document.getElementById('errorCard');
     const errorMessage = document.getElementById('errorMessage');
     const btnText = analyzeBtn.querySelector('.btn-text');
     const loadingSpinner = analyzeBtn.querySelector('.loading-spinner');
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 历史记录相关元素
     const historyToggleBtn = document.getElementById('historyToggleBtn');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-    const historyContent = document.getElementById('historyContent');
+    const historyCard = document.getElementById('historyCard');
     const historyEmpty = document.getElementById('historyEmpty');
     const historyList = document.getElementById('historyList');
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingSpinner.style.display = 'block';
             analyzeBtn.disabled = true;
         } else {
-            btnText.textContent = '分析卡路里';
+            btnText.textContent = '开始分析';
             loadingSpinner.style.display = 'none';
             analyzeBtn.disabled = false;
         }
@@ -177,64 +177,59 @@ document.addEventListener('DOMContentLoaded', function() {
             总计: ${usage.total_tokens}
         `;
         
-        resultSection.style.display = 'block';
-        errorSection.style.display = 'none';
+        resultCard.style.display = 'block';
+        errorCard.style.display = 'none';
         
         // 保存到历史记录
         saveToHistory(analysis, usage);
         
         // 平滑滚动到结果区域
-        resultSection.scrollIntoView({ behavior: 'smooth' });
+        resultCard.scrollIntoView({ behavior: 'smooth' });
     }
 
     function showError(message) {
         errorMessage.textContent = message;
-        errorSection.style.display = 'block';
-        resultSection.style.display = 'none';
+        errorCard.style.display = 'block';
+        resultCard.style.display = 'none';
         
         // 平滑滚动到错误区域
-        errorSection.scrollIntoView({ behavior: 'smooth' });
+        errorCard.scrollIntoView({ behavior: 'smooth' });
     }
 
     function hideResults() {
-        resultSection.style.display = 'none';
-        errorSection.style.display = 'none';
+        resultCard.style.display = 'none';
+        errorCard.style.display = 'none';
     }
 
-    // 历史记录功能
     function saveToHistory(analysis, usage) {
         if (!selectedFile) return;
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const historyItem = {
-                id: Date.now(),
-                date: new Date().toLocaleString('zh-CN'),
-                image: e.target.result, // base64格式的图片
-                analysis: analysis,
-                usage: usage
-            };
-
-            let history = getHistory();
-            history.unshift(historyItem); // 最新的记录放在前面
-            
-            // 限制历史记录数量（最多保存50条）
-            if (history.length > 50) {
-                history = history.slice(0, 50);
-            }
-
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            loadHistory(); // 重新加载历史记录显示
+        const historyItem = {
+            id: Date.now(),
+            date: new Date().toLocaleString('zh-CN'),
+            imageData: previewImg.src,
+            analysis: analysis,
+            usage: usage
         };
-        reader.readAsDataURL(selectedFile);
+
+        const history = getHistory();
+        history.unshift(historyItem);
+
+        // 只保留最近50条记录
+        if (history.length > 50) {
+            history.splice(50);
+        }
+
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        loadHistory();
     }
 
     function getHistory() {
         try {
             const history = localStorage.getItem(HISTORY_KEY);
             return history ? JSON.parse(history) : [];
-        } catch (e) {
-            console.error('读取历史记录失败:', e);
+        } catch (error) {
+            console.error('Failed to load history:', error);
             return [];
         }
     }
@@ -244,11 +239,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (history.length === 0) {
             historyEmpty.style.display = 'block';
-            historyList.innerHTML = '';
+            historyList.style.display = 'none';
             return;
         }
 
         historyEmpty.style.display = 'none';
+        historyList.style.display = 'block';
         historyList.innerHTML = '';
 
         history.forEach(item => {
@@ -258,58 +254,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createHistoryItemElement(item) {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        div.innerHTML = `
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.innerHTML = `
             <div class="history-item-header">
                 <span class="history-date">${item.date}</span>
                 <button class="history-delete" onclick="deleteHistoryItem(${item.id})">删除</button>
             </div>
             <div class="history-image-container">
-                <img class="history-image" src="${item.image}" alt="历史图片" onclick="viewImage('${item.image}')">
+                <img src="${item.imageData}" alt="历史图片" class="history-image" onclick="showImageModal('${item.imageData}')">
             </div>
             <div class="history-result">${item.analysis}</div>
-            <div class="history-usage">
-                Token使用: 输入 ${item.usage.prompt_tokens} | 输出 ${item.usage.completion_tokens} | 总计 ${item.usage.total_tokens}
-            </div>
+            <div class="history-usage">Token: ${item.usage.total_tokens} (输入: ${item.usage.prompt_tokens}, 输出: ${item.usage.completion_tokens})</div>
         `;
-        return div;
+        return li;
     }
 
     function toggleHistory() {
         historyVisible = !historyVisible;
         if (historyVisible) {
-            historyContent.style.display = 'block';
-            historyToggleBtn.textContent = '隐藏历史';
-            loadHistory(); // 确保显示最新数据
+            historyCard.style.display = 'block';
+            historyToggleBtn.innerHTML = '<span>📝</span>隐藏记录';
+            loadHistory();
         } else {
-            historyContent.style.display = 'none';
-            historyToggleBtn.textContent = '查看历史';
+            historyCard.style.display = 'none';
+            historyToggleBtn.innerHTML = '<span>📝</span>历史记录';
         }
     }
 
     function clearAllHistory() {
-        if (confirm('确定要清空所有历史记录吗？此操作不可恢复。')) {
+        if (confirm('确定要清空所有历史记录吗？此操作不可撤销。')) {
             localStorage.removeItem(HISTORY_KEY);
             loadHistory();
-            showError('历史记录已清空');
-            setTimeout(() => {
-                hideResults();
-            }, 2000);
         }
     }
 
-    // 全局函数，供HTML中的onclick调用
+    // 全局函数，供HTML调用
     window.deleteHistoryItem = function(id) {
-        if (confirm('确定要删除这条历史记录吗？')) {
-            let history = getHistory();
-            history = history.filter(item => item.id !== id);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            loadHistory();
-        }
+        const history = getHistory();
+        const filteredHistory = history.filter(item => item.id !== id);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(filteredHistory));
+        loadHistory();
     };
 
-    window.viewImage = function(imageSrc) {
+    window.showImageModal = function(imageSrc) {
         // 创建模态框显示大图
         const modal = document.createElement('div');
         modal.style.cssText = `
@@ -318,10 +306,10 @@ document.addEventListener('DOMContentLoaded', function() {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             z-index: 1000;
             cursor: pointer;
         `;
@@ -331,8 +319,8 @@ document.addEventListener('DOMContentLoaded', function() {
         img.style.cssText = `
             max-width: 90%;
             max-height: 90%;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         `;
         
         modal.appendChild(img);
