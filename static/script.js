@@ -167,7 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showResult(analysis, usage) {
-        resultContent.textContent = analysis;
+        // 尝试解析并格式化分析结果
+        const formattedResult = formatAnalysisResult(analysis);
+        resultContent.innerHTML = formattedResult;
         
         // 显示token使用情况
         usageInfo.innerHTML = `
@@ -185,6 +187,97 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 平滑滚动到结果区域
         resultCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function formatAnalysisResult(analysis) {
+        // 解析AI返回的结构化数据
+        const lines = analysis.split('\n').filter(line => line.trim());
+        let foodName = '';
+        let calories = '';
+        let calorieLevel = '';
+        let carb = '';
+        let protein = '';
+        let fat = '';
+        let suggestion = '';
+
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('食物名称：')) {
+                foodName = trimmedLine.replace('食物名称：', '').trim();
+            } else if (trimmedLine.startsWith('热量：')) {
+                calories = trimmedLine.replace('热量：', '').trim();
+            } else if (trimmedLine.startsWith('热量等级：')) {
+                calorieLevel = trimmedLine.replace('热量等级：', '').trim();
+            } else if (trimmedLine.startsWith('碳水：')) {
+                carb = trimmedLine.replace('碳水：', '').trim();
+            } else if (trimmedLine.startsWith('蛋白质：')) {
+                protein = trimmedLine.replace('蛋白质：', '').trim();
+            } else if (trimmedLine.startsWith('脂肪：')) {
+                fat = trimmedLine.replace('脂肪：', '').trim();
+            } else if (trimmedLine.startsWith('食用建议：')) {
+                suggestion = trimmedLine.replace('食用建议：', '').trim();
+            }
+        });
+
+        // 如果解析失败，返回原始文本
+        if (!foodName && !calories) {
+            return `<pre style="margin: 0;">${analysis}</pre>`;
+        }
+
+        // 生成格式化的HTML
+        const levelBadgeClass = getLevelBadgeClass(calorieLevel);
+        
+        return `
+            <div class="food-analysis-card">
+                <div class="food-header">
+                    <h3 class="food-name">${foodName}</h3>
+                    <span class="calorie-badge ${levelBadgeClass}">${calorieLevel}</span>
+                </div>
+                
+                <div class="calorie-display">
+                    <div class="calorie-number">${calories.replace(' 千卡', '')}</div>
+                    <div class="calorie-unit">千卡</div>
+                </div>
+                
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">
+                            <span class="nutrition-dot carb"></span>
+                            碳水
+                        </div>
+                        <div class="nutrition-value">${carb}</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">
+                            <span class="nutrition-dot protein"></span>
+                            蛋白质
+                        </div>
+                        <div class="nutrition-value">${protein}</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-label">
+                            <span class="nutrition-dot fat"></span>
+                            脂肪
+                        </div>
+                        <div class="nutrition-value">${fat}</div>
+                    </div>
+                </div>
+                
+                ${suggestion ? `<div class="food-suggestion">
+                    <strong>食用建议：</strong>${suggestion}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function getLevelBadgeClass(level) {
+        switch(level) {
+            case '低': return 'level-low';
+            case '中': return 'level-medium';
+            case '高': return 'level-high';
+            case '极高': return 'level-extreme';
+            default: return 'level-medium';
+        }
     }
 
     function showError(message) {
