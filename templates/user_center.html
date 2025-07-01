@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心 - 智能卡路里分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部导航 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-icon">🍎</div>
+                    <h1>用户中心</h1>
+                </div>
+                <div class="user-menu">
+                    <a href="/" class="back-link">返回首页</a>
+                    <button id="logoutBtn" class="logout-btn">退出</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="main-content">
+            <!-- 用户信息卡片 -->
+            <div class="card user-info-card">
+                <div class="card-header">
+                    <h2>个人信息</h2>
+                    <button id="editProfileBtn" class="btn btn-secondary">编辑</button>
+                </div>
+                
+                <div class="user-profile">
+                    <!-- 头像区域 -->
+                    <div class="avatar-section">
+                        <div class="avatar-container">
+                            <img id="userAvatar" src="{{ user.profile.avatar if user.profile and user.profile.avatar else '/static/default-avatar.svg' }}"
+                                 alt="用户头像" onerror="this.src='/static/default-avatar.svg'">
+                            <div class="avatar-overlay" id="avatarOverlay">
+                                <span>更换头像</span>
+                            </div>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+                    </div>
+
+                    <!-- 基本信息 -->
+                    <div class="profile-info">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>昵称</label>
+                                <span id="displayNickname">{{ user.profile.nickname if user.profile else user.username }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>性别</label>
+                                <span id="displayGender">{{ '男性' if user.profile and user.profile.gender == 'male' else '女性' if user.profile and user.profile.gender == 'female' else '未设置' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>年龄</label>
+                                <span id="displayAge">{{ user.profile.age if user.profile and user.profile.age else '未设置' }}{{ '岁' if user.profile and user.profile.age else '' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>身高</label>
+                                <span id="displayHeight">{{ user.profile.height if user.profile and user.profile.height else '未设置' }}{{ 'cm' if user.profile and user.profile.height else '' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>体重</label>
+                                <span id="displayWeight">{{ user.profile.weight if user.profile and user.profile.weight else '未设置' }}{{ 'kg' if user.profile and user.profile.weight else '' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>目标体重</label>
+                                <span id="displayTargetWeight">{{ user.profile.target_weight if user.profile and user.profile.target_weight else '未设置' }}{{ 'kg' if user.profile and user.profile.target_weight else '' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 健康数据卡片 -->
+            <div class="card health-data-card">
+                <div class="card-header">
+                    <h2>健康数据</h2>
+                </div>
+                
+                <div class="health-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <div class="stat-label">每日热量目标</div>
+                            <div class="stat-value" id="calorieGoal">{{ user.profile.daily_calorie_goal if user.profile and user.profile.daily_calorie_goal else '未计算' }}{{ ' kcal' if user.profile and user.profile.daily_calorie_goal else '' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">BMI指数</div>
+                            <div class="stat-value" id="bmiValue">{{ '%.1f'|format(user.profile.weight / ((user.profile.height/100) ** 2)) if user.profile and user.profile.weight and user.profile.height else '未计算' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon">🏃</div>
+                        <div class="stat-content">
+                            <div class="stat-label">活动水平</div>
+                            <div class="stat-value" id="activityLevel">
+                                {% if user.profile and user.profile.activity_level %}
+                                    {% if user.profile.activity_level == 'sedentary' %}久坐不动
+                                    {% elif user.profile.activity_level == 'light' %}轻度活动
+                                    {% elif user.profile.activity_level == 'moderate' %}中度活动
+                                    {% elif user.profile.activity_level == 'active' %}高度活动
+                                    {% elif user.profile.activity_level == 'very_active' %}极高活动
+                                    {% endif %}
+                                {% else %}未设置{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 编辑表单（隐藏） -->
+            <div id="editFormCard" class="card edit-form-card" style="display:none;">
+                <div class="card-header">
+                    <h2>编辑个人信息</h2>
+                    <button id="cancelEditBtn" class="btn btn-secondary">取消</button>
+                </div>
+                
+                <form id="editProfileForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="editNickname">昵称</label>
+                            <input type="text" id="editNickname" name="nickname" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editGender">性别</label>
+                            <select id="editGender" name="gender" required>
+                                <option value="male">男性</option>
+                                <option value="female">女性</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editAge">年龄</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="editAge" name="age" required min="10" max="120">
+                                <span class="unit">岁</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editHeight">身高</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="editHeight" name="height" required min="100" max="250" step="0.1">
+                                <span class="unit">cm</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editWeight">体重</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="editWeight" name="weight" required min="30" max="300" step="0.1">
+                                <span class="unit">kg</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editTargetWeight">目标体重</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="editTargetWeight" name="target_weight" min="30" max="300" step="0.1">
+                                <span class="unit">kg</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editGoalType">目标类型</label>
+                            <select id="editGoalType" name="goal_type">
+                                <option value="lose">减重</option>
+                                <option value="maintain">维持体重</option>
+                                <option value="gain">增重</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editActivityLevel">活动水平</label>
+                            <select id="editActivityLevel" name="activity_level">
+                                <option value="sedentary">久坐不动</option>
+                                <option value="light">轻度活动</option>
+                                <option value="moderate">中度活动</option>
+                                <option value="active">高度活动</option>
+                                <option value="very_active">极高活动</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text">保存更改</span>
+                            <span class="loading-spinner" style="display:none;"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- 成功提示 -->
+    <div id="successMessage" class="success-message" style="display:none;"></div>
+    
+    <!-- 错误提示 -->
+    <div id="errorMessage" class="error-message" style="display:none;"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // 用户中心相关功能
+        let isEditing = false;
+        let currentUserData = null;
+
+        // 获取用户完整信息
+        function loadUserProfile() {
+            fetch('/api/user/profile')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        currentUserData = result.user;
+                        updateDisplayInfo(result.user);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profile:', error);
+                });
+        }
+
+        // 更新显示信息
+        function updateDisplayInfo(user) {
+            const profile = user.profile || {};
+            
+            document.getElementById('displayNickname').textContent = profile.nickname || user.username;
+            document.getElementById('displayGender').textContent = profile.gender === 'male' ? '男性' : profile.gender === 'female' ? '女性' : '未设置';
+            document.getElementById('displayAge').textContent = profile.age ? profile.age + '岁' : '未设置';
+            document.getElementById('displayHeight').textContent = profile.height ? profile.height + 'cm' : '未设置';
+            document.getElementById('displayWeight').textContent = profile.weight ? profile.weight + 'kg' : '未设置';
+            document.getElementById('displayTargetWeight').textContent = profile.target_weight ? profile.target_weight + 'kg' : '未设置';
+            document.getElementById('calorieGoal').textContent = profile.daily_calorie_goal ? profile.daily_calorie_goal + ' kcal' : '未计算';
+            
+            // 计算BMI
+            if (profile.weight && profile.height) {
+                const bmi = profile.weight / Math.pow(profile.height / 100, 2);
+                document.getElementById('bmiValue').textContent = bmi.toFixed(1);
+            } else {
+                document.getElementById('bmiValue').textContent = '未计算';
+            }
+            
+            // 活动水平
+            const activityLabels = {
+                'sedentary': '久坐不动',
+                'light': '轻度活动',
+                'moderate': '中度活动',
+                'active': '高度活动',
+                'very_active': '极高活动'
+            };
+            document.getElementById('activityLevel').textContent = activityLabels[profile.activity_level] || '未设置';
+        }
+
+        // 编辑模式切换
+        document.getElementById('editProfileBtn').addEventListener('click', function() {
+            if (!currentUserData) return;
+            
+            const profile = currentUserData.profile || {};
+            
+            // 填充编辑表单
+            document.getElementById('editNickname').value = profile.nickname || '';
+            document.getElementById('editGender').value = profile.gender || 'male';
+            document.getElementById('editAge').value = profile.age || '';
+            document.getElementById('editHeight').value = profile.height || '';
+            document.getElementById('editWeight').value = profile.weight || '';
+            document.getElementById('editTargetWeight').value = profile.target_weight || '';
+            document.getElementById('editGoalType').value = profile.goal_type || 'maintain';
+            document.getElementById('editActivityLevel').value = profile.activity_level || 'moderate';
+            
+            // 显示编辑表单
+            document.querySelector('.user-info-card').style.display = 'none';
+            document.querySelector('.health-data-card').style.display = 'none';
+            document.getElementById('editFormCard').style.display = 'block';
+            isEditing = true;
+        });
+
+        // 取消编辑
+        document.getElementById('cancelEditBtn').addEventListener('click', function() {
+            document.querySelector('.user-info-card').style.display = 'block';
+            document.querySelector('.health-data-card').style.display = 'block';
+            document.getElementById('editFormCard').style.display = 'none';
+            isEditing = false;
+        });
+
+        // 保存编辑
+        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            
+            // 显示加载状态
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            
+            fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showSuccess('个人信息更新成功');
+                    loadUserProfile(); // 重新加载数据
+                    
+                    // 退出编辑模式
+                    document.querySelector('.user-info-card').style.display = 'block';
+                    document.querySelector('.health-data-card').style.display = 'block';
+                    document.getElementById('editFormCard').style.display = 'none';
+                    isEditing = false;
+                } else {
+                    showError(result.error || '更新失败，请重试');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('网络错误，请重试');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+            });
+        });
+
+        // 显示成功消息
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 页面加载时获取用户信息
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserProfile();
+        });
+    </script>
+</body>
+</html>

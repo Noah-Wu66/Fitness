@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完善个人信息 - 智能卡路里分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="setup-body">
+    <div class="setup-container">
+        <!-- 头部 -->
+        <header class="setup-header">
+            <div class="logo">
+                <div class="logo-icon">🍎</div>
+                <h1>完善个人信息</h1>
+            </div>
+            <p class="setup-subtitle">为您提供个性化的健康建议</p>
+        </header>
+
+        <!-- 进度指示器 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">基本信息</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">目标设定</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 表单容器 -->
+        <div class="form-container">
+            <form id="setupForm" method="POST">
+                <!-- 第一步：基本信息 -->
+                <div class="form-step active" data-step="1">
+                    <div class="step-header">
+                        <h2>基本信息</h2>
+                        <p>请填写您的基本身体信息</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nickname">昵称 <span class="required">*</span></label>
+                            <input type="text" id="nickname" name="nickname" required 
+                                   placeholder="请输入您的昵称" value="{{ user.profile.nickname if user.profile else '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gender">性别 <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="gender" value="male" required
+                                           {{ 'checked' if user.profile and user.profile.gender == 'male' else '' }}>
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-label">男性</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="gender" value="female" required
+                                           {{ 'checked' if user.profile and user.profile.gender == 'female' else '' }}>
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-label">女性</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="age">年龄 <span class="required">*</span></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="age" name="age" required min="10" max="120" 
+                                       placeholder="25" value="{{ user.profile.age if user.profile and user.profile.age else '' }}">
+                                <span class="unit">岁</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="height">身高 <span class="required">*</span></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="height" name="height" required min="100" max="250" step="0.1"
+                                       placeholder="170" value="{{ user.profile.height if user.profile and user.profile.height else '' }}">
+                                <span class="unit">cm</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weight">体重 <span class="required">*</span></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="weight" name="weight" required min="30" max="300" step="0.1"
+                                       placeholder="65" value="{{ user.profile.weight if user.profile and user.profile.weight else '' }}">
+                                <span class="unit">kg</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="nextStep">下一步</button>
+                    </div>
+                </div>
+
+                <!-- 第二步：目标设定 -->
+                <div class="form-step" data-step="2">
+                    <div class="step-header">
+                        <h2>目标设定</h2>
+                        <p>设定您的健康目标</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="target_weight">目标体重</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="target_weight" name="target_weight" min="30" max="300" step="0.1"
+                                       placeholder="60" value="{{ user.profile.target_weight if user.profile and user.profile.target_weight else '' }}">
+                                <span class="unit">kg</span>
+                            </div>
+                            <div class="form-hint">可选，不填写则默认为维持当前体重</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="goal_type">目标类型</label>
+                            <select id="goal_type" name="goal_type">
+                                <option value="lose" {{ 'selected' if user.profile and user.profile.goal_type == 'lose' else '' }}>减重</option>
+                                <option value="maintain" {{ 'selected' if not user.profile or user.profile.goal_type == 'maintain' else '' }}>维持体重</option>
+                                <option value="gain" {{ 'selected' if user.profile and user.profile.goal_type == 'gain' else '' }}>增重</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity_level">活动水平</label>
+                            <select id="activity_level" name="activity_level">
+                                <option value="sedentary" {{ 'selected' if user.profile and user.profile.activity_level == 'sedentary' else '' }}>久坐不动（办公室工作）</option>
+                                <option value="light" {{ 'selected' if user.profile and user.profile.activity_level == 'light' else '' }}>轻度活动（每周1-3次运动）</option>
+                                <option value="moderate" {{ 'selected' if not user.profile or user.profile.activity_level == 'moderate' else '' }}>中度活动（每周3-5次运动）</option>
+                                <option value="active" {{ 'selected' if user.profile and user.profile.activity_level == 'active' else '' }}>高度活动（每周6-7次运动）</option>
+                                <option value="very_active" {{ 'selected' if user.profile and user.profile.activity_level == 'very_active' else '' }}>极高活动（每天运动或体力工作）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="prevStep">上一步</button>
+                        <button type="submit" class="btn btn-primary" id="submitForm">
+                            <span class="btn-text">完成设置</span>
+                            <span class="loading-spinner" style="display:none;"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="errorMessage" class="error-message" style="display:none;"></div>
+    </div>
+
+    <script>
+        // 表单步骤控制
+        let currentStep = 1;
+        const totalSteps = 2;
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const steps = document.querySelectorAll('.step');
+            const formSteps = document.querySelectorAll('.form-step');
+            
+            // 更新进度条
+            const progress = (currentStep / totalSteps) * 100;
+            progressFill.style.width = progress + '%';
+            
+            // 更新步骤指示器
+            steps.forEach((step, index) => {
+                const stepNumber = index + 1;
+                if (stepNumber <= currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+            
+            // 更新表单步骤显示
+            formSteps.forEach((step, index) => {
+                const stepNumber = index + 1;
+                if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        function validateStep(step) {
+            const formStep = document.querySelector(`.form-step[data-step="${step}"]`);
+            const requiredFields = formStep.querySelectorAll('[required]');
+            
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    field.focus();
+                    showError(`请填写${field.previousElementSibling.textContent.replace(' *', '')}`);
+                    return false;
+                }
+            }
+            
+            // 验证数值范围
+            if (step === 1) {
+                const age = parseInt(document.getElementById('age').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const weight = parseFloat(document.getElementById('weight').value);
+                
+                if (age < 10 || age > 120) {
+                    showError('年龄必须在10-120之间');
+                    return false;
+                }
+                if (height < 100 || height > 250) {
+                    showError('身高必须在100-250厘米之间');
+                    return false;
+                }
+                if (weight < 30 || weight > 300) {
+                    showError('体重必须在30-300公斤之间');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 事件监听
+        document.getElementById('nextStep').addEventListener('click', function() {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                updateProgress();
+            }
+        });
+
+        document.getElementById('prevStep').addEventListener('click', function() {
+            currentStep--;
+            updateProgress();
+        });
+
+        // 表单提交
+        document.getElementById('setupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateStep(currentStep)) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitForm');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            
+            // 显示加载状态
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            
+            // 提交表单数据
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('/auth/setup-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // 成功，跳转到主页
+                    window.location.href = '/';
+                } else {
+                    showError(result.error || '设置失败，请重试');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('网络错误，请重试');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+            });
+        });
+
+        // 初始化
+        updateProgress();
+    </script>
+</body>
+</html>

@@ -49,6 +49,11 @@ client = genai.Client(
 @login_required
 def index():
     user = get_current_user()
+
+    # 检查用户是否完成了个人信息设置
+    if not user.get('profile_completed', False):
+        return redirect(url_for('auth.setup_profile'))
+
     return render_template('index.html', user=user)
 
 @app.route('/analyze', methods=['POST'])
@@ -180,6 +185,79 @@ def analyze_calories():
 @app.errorhandler(413)
 def too_large(e):
     return jsonify({'error': '文件过大，请上传小于20MB的图片'}), 413
+
+@app.route('/user-center')
+@login_required
+def user_center():
+    """用户中心页面"""
+    user = get_current_user()
+    return render_template('user_center.html', user=user)
+
+@app.route('/api/user/profile', methods=['GET', 'PUT'])
+@login_required
+def user_profile_api():
+    """用户信息API"""
+    user = get_current_user()
+
+    if request.method == 'GET':
+        # 获取用户完整信息
+        user_data = user_model.get_user_by_id(user['id'])
+        if user_data:
+            return jsonify({
+                'success': True,
+                'user': {
+                    'id': user_data['id'],
+                    'username': user_data['username'],
+                    'email': user_data['email'],
+                    'profile': user_data.get('profile', {}),
+                    'profile_completed': user_data.get('profile_completed', False)
+                }
+            })
+        else:
+            return jsonify({'success': False, 'error': '用户不存在'}), 404
+
+    elif request.method == 'PUT':
+        # 更新用户信息
+        data = request.get_json()
+
+        # 转换数值类型
+        try:
+            if 'age' in data:
+                data['age'] = int(data['age'])
+            if 'height' in data:
+                data['height'] = float(data['height'])
+            if 'weight' in data:
+                data['weight'] = float(data['weight'])
+            if 'target_weight' in data and data['target_weight']:
+                data['target_weight'] = float(data['target_weight'])
+        except ValueError:
+            return jsonify({'success': False, 'error': '请输入有效的数值'}), 400
+
+        # 更新用户信息
+        result = user_model.update_user_profile(user['id'], data)
+        return jsonify(result)
+
+@app.route('/api/user/calorie-goal')
+@login_required
+def get_calorie_goal():
+    """获取用户每日热量目标"""
+    user = get_current_user()
+    user_data = user_model.get_user_by_id(user['id'])
+
+    if user_data and user_data.get('profile'):
+        profile = user_data['profile']
+        daily_calorie_goal = profile.get('daily_calorie_goal', 2000)
+
+        return jsonify({
+            'success': True,
+            'daily_calorie_goal': daily_calorie_goal,
+            'profile': profile
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': '请先完成个人信息设置'
+        }), 400
 
 # 内置管理员注册密钥
 ADMIN_REGISTRATION_KEY = 'H7jK9mN2pQ5rS8tU1vW4xY7zA0bC3dF6gH9jK2mN5pQ8rS1tU4vW7xY0zA3bC6dF'

@@ -188,18 +188,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function showResult(analysis, usage) {
         const formattedResult = formatAnalysisResult(analysis);
         resultContent.innerHTML = formattedResult;
-        
+
         // 隐藏或移除token使用信息显示
         if (typeof usageInfo !== 'undefined') {
             const infoEl = document.getElementById('usageInfo');
             if (infoEl) infoEl.style.display = 'none';
         }
-        
+
         resultCard.style.display = 'block';
         errorCard.style.display = 'none';
-        
+
         saveToServer(analysis, usage);
-        
+
+        // 更新热量仪表盘
+        if (typeof onAnalysisComplete === 'function') {
+            onAnalysisComplete(analysis);
+        }
+
         resultCard.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -540,4 +545,163 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(modal);
         });
     };
-}); 
+
+    // ===== 热量仪表盘功能 =====
+    const calorieDashboard = document.getElementById('calorieDashboard');
+    const currentCaloriesEl = document.getElementById('currentCalories');
+    const targetCaloriesEl = document.getElementById('targetCalories');
+    const remainingCaloriesEl = document.getElementById('remainingCalories');
+    const calorieProgressEl = document.getElementById('calorieProgress');
+    const dashboardDateEl = document.getElementById('dashboardDate');
+    const circleProgress = document.querySelector('.circle-progress');
+
+    let dailyCalorieGoal = 2000;
+    let currentCalories = 0;
+
+    // 初始化热量仪表盘
+    function initCalorieDashboard() {
+        // 设置当前日期
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        if (dashboardDateEl) {
+            dashboardDateEl.textContent = dateStr;
+        }
+
+        // 获取用户热量目标
+        loadCalorieGoal();
+
+        // 加载今日热量摄入（从历史记录计算）
+        loadTodayCalories();
+    }
+
+    // 获取用户热量目标
+    function loadCalorieGoal() {
+        fetch('/api/user/calorie-goal')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    dailyCalorieGoal = result.daily_calorie_goal || 2000;
+                    updateCalorieDashboard();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading calorie goal:', error);
+                // 使用默认值
+                updateCalorieDashboard();
+            });
+    }
+
+    // 加载今日热量摄入
+    function loadTodayCalories() {
+        fetch('/api/history/')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    currentCalories = calculateTodayCalories(result.history);
+                    updateCalorieDashboard();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading today calories:', error);
+            });
+    }
+
+    // 从历史记录计算今日热量
+    function calculateTodayCalories(history) {
+        const today = new Date().toDateString();
+        let totalCalories = 0;
+
+        history.forEach(record => {
+            const recordDate = new Date(record.created_at).toDateString();
+            if (recordDate === today) {
+                // 从分析结果中提取热量信息
+                const calories = extractCaloriesFromAnalysis(record.analysis_result);
+                if (calories) {
+                    totalCalories += calories;
+                }
+            }
+        });
+
+        return totalCalories;
+    }
+
+    // 从分析结果中提取热量数值
+    function extractCaloriesFromAnalysis(analysisText) {
+        if (!analysisText) return 0;
+
+        // 匹配热量信息，格式如："热量：XXX 千卡"
+        const calorieMatch = analysisText.match(/热量[：:]\s*(\d+(?:\.\d+)?)\s*千卡/);
+        if (calorieMatch) {
+            return parseFloat(calorieMatch[1]);
+        }
+
+        return 0;
+    }
+
+    // 更新热量仪表盘显示
+    function updateCalorieDashboard() {
+        if (!calorieDashboard) return;
+
+        const remaining = Math.max(0, dailyCalorieGoal - currentCalories);
+        const progress = Math.min(100, (currentCalories / dailyCalorieGoal) * 100);
+
+        // 更新数值显示
+        if (currentCaloriesEl) {
+            currentCaloriesEl.textContent = Math.round(currentCalories);
+        }
+        if (targetCaloriesEl) {
+            targetCaloriesEl.textContent = dailyCalorieGoal + ' kcal';
+        }
+        if (remainingCaloriesEl) {
+            remainingCaloriesEl.textContent = Math.round(remaining) + ' kcal';
+        }
+        if (calorieProgressEl) {
+            calorieProgressEl.textContent = Math.round(progress) + '%';
+        }
+
+        // 更新圆形进度条
+        if (circleProgress) {
+            const circumference = 2 * Math.PI * 80; // r = 80
+            const offset = circumference - (progress / 100) * circumference;
+            circleProgress.style.strokeDashoffset = offset;
+
+            // 根据进度改变颜色
+            if (progress >= 100) {
+                circleProgress.style.stroke = '#ef4444'; // 红色：超标
+            } else if (progress >= 80) {
+                circleProgress.style.stroke = '#f59e0b'; // 黄色：接近目标
+            } else {
+                circleProgress.style.stroke = 'white'; // 白色：正常
+            }
+        }
+    }
+
+    // 监听分析完成事件，更新热量数据
+    function onAnalysisComplete(analysisResult) {
+        const calories = extractCaloriesFromAnalysis(analysisResult);
+        if (calories > 0) {
+            currentCalories += calories;
+            updateCalorieDashboard();
+
+            // 添加动画效果
+            if (currentCaloriesEl) {
+                currentCaloriesEl.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    currentCaloriesEl.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+    }
+
+    // 将onAnalysisComplete函数暴露到全局作用域
+    window.onAnalysisComplete = onAnalysisComplete;
+
+    // 初始化仪表盘
+    if (calorieDashboard) {
+        initCalorieDashboard();
+    }
+});

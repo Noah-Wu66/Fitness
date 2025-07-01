@@ -1329,4 +1329,809 @@ body.history-open {
     color: #1e40af;
     font-weight: 500;
     line-height: 1.3;
-} 
+}
+
+/* ===== 用户信息设置页面样式 ===== */
+.setup-body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.setup-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.setup-header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.setup-header .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.setup-header .logo-icon {
+    font-size: 32px;
+}
+
+.setup-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.setup-subtitle {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* 进度指示器 */
+.progress-container {
+    margin-bottom: 40px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 50%;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.3s ease;
+}
+
+.step.active {
+    color: white;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: background 0.3s ease;
+}
+
+.step.active .step-number {
+    background: white;
+    color: var(--primary-color);
+}
+
+.step-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 表单容器 */
+.form-container {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-xl);
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.step-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.step-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.step-header p {
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.required {
+    color: var(--error-color);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+}
+
+.input-with-unit {
+    position: relative;
+}
+
+.input-with-unit .unit {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.input-with-unit input {
+    padding-right: 50px;
+}
+
+/* 单选按钮组 */
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.radio-option input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    margin-right: 8px;
+    position: relative;
+    transition: border-color 0.2s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+    border-color: var(--primary-color);
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.radio-label {
+    color: var(--text-primary);
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.form-actions .btn {
+    flex: 1;
+    max-width: 200px;
+}
+
+.form-actions .btn:only-child {
+    margin-left: auto;
+}
+
+/* 错误消息 */
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-top: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* 成功消息 */
+.success-message {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-top: 20px;
+    font-size: 14px;
+    text-align: center;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===== 热量仪表盘样式 ===== */
+.calorie-dashboard {
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.dashboard-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dashboard-date {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.calorie-chart-container {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+@media (max-width: 768px) {
+    .calorie-chart-container {
+        flex-direction: column;
+        gap: 24px;
+    }
+}
+
+.calorie-chart {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    flex-shrink: 0;
+}
+
+.circular-chart {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 8;
+}
+
+.circle-progress {
+    fill: none;
+    stroke: white;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 502.65; /* 2 * π * 80 */
+    stroke-dashoffset: 502.65;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.current-calories {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.calories-unit {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+.calorie-stats {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .calorie-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.calorie-stats .stat-item {
+    text-align: center;
+}
+
+.calorie-stats .stat-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.calorie-stats .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ===== 用户中心样式 ===== */
+.user-center-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s ease;
+}
+
+.user-center-link:hover {
+    background: var(--primary-light);
+}
+
+.back-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s ease;
+}
+
+.back-link:hover {
+    background: var(--border-color);
+}
+
+.user-info-card,
+.health-data-card,
+.edit-form-card {
+    margin-bottom: 24px;
+}
+
+.user-profile {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+    .user-profile {
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+    }
+}
+
+.avatar-section {
+    flex-shrink: 0;
+}
+
+.avatar-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.avatar-container:hover {
+    transform: scale(1.05);
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.avatar-container:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-item label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.info-item span {
+    font-size: 16px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.health-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+}
+
+.health-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--primary-light);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(30, 144, 255, 0.1);
+}
+
+.stat-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.health-stats .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ===== 移动端适配 ===== */
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+
+    .header-top {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .user-menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .user-info {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .setup-container {
+        padding: 16px;
+    }
+
+    .form-container {
+        padding: 24px 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        max-width: none;
+    }
+
+    .calorie-chart {
+        width: 140px;
+        height: 140px;
+    }
+
+    .current-calories {
+        font-size: 28px;
+    }
+
+    .calorie-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .calorie-stats .stat-item {
+        padding: 16px;
+    }
+
+    .health-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .health-stats .stat-item {
+        padding: 16px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .avatar-container {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo h1 {
+        font-size: 20px;
+    }
+
+    .setup-header h1 {
+        font-size: 24px;
+    }
+
+    .step-header h2 {
+        font-size: 20px;
+    }
+
+    .calorie-chart {
+        width: 120px;
+        height: 120px;
+    }
+
+    .current-calories {
+        font-size: 24px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .dashboard-header h2 {
+        font-size: 18px;
+    }
+}
+
+/* ===== 触摸友好的按钮 ===== */
+@media (max-width: 768px) {
+    .btn {
+        min-height: 44px;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+
+    .logout-btn,
+    .user-center-link,
+    .back-link,
+    .admin-link {
+        min-height: 44px;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upload-area {
+        min-height: 200px;
+        padding: 32px 20px;
+    }
+
+    .analyze-btn,
+    .history-btn {
+        min-height: 48px;
+        font-size: 16px;
+    }
+}
+
+/* ===== 加载动画优化 ===== */
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== 平滑过渡动画 ===== */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* ===== 无障碍访问优化 ===== */
+.btn:focus,
+input:focus,
+select:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.radio-option:focus-within .radio-custom {
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+}
+
+/* ===== 深色模式支持 ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #111827;
+        --card-background: #1F2937;
+        --text-primary: #F9FAFB;
+        --text-secondary: #D1D5DB;
+        --text-tertiary: #9CA3AF;
+        --border-color: #374151;
+        --border-hover: #4B5563;
+    }
+
+    .setup-body {
+        background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+    }
+
+    .circle-bg {
+        stroke: rgba(255, 255, 255, 0.1);
+    }
+}

@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, session
 from models.user import User
-from auth.auth import login_user, logout_user, get_current_user
+from auth.auth import login_user, logout_user, get_current_user, login_required
 
 def create_auth_blueprint(mongo):
     """创建认证蓝图"""
@@ -185,5 +185,63 @@ def create_auth_blueprint(mongo):
             return jsonify({'success': True, 'user': user})
         else:
             return jsonify({'success': False, 'error': '未登录'}), 401
+
+    @auth_bp.route('/setup-profile', methods=['GET', 'POST'])
+    @login_required
+    def setup_profile():
+        """用户信息设置页面"""
+        user = get_current_user()
+        if not user:
+            return redirect(url_for('auth.login'))
+
+        if request.method == 'GET':
+            return render_template('auth/user_info_setup.html', user=user)
+
+        # POST请求处理信息保存
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = request.form.to_dict()
+
+        # 转换数值类型
+        try:
+            if 'age' in data:
+                data['age'] = int(data['age'])
+            if 'height' in data:
+                data['height'] = float(data['height'])
+            if 'weight' in data:
+                data['weight'] = float(data['weight'])
+            if 'target_weight' in data and data['target_weight']:
+                data['target_weight'] = float(data['target_weight'])
+        except ValueError:
+            error_msg = '请输入有效的数值'
+            if request.is_json:
+                return jsonify({'success': False, 'error': error_msg}), 400
+            else:
+                flash(error_msg, 'error')
+                return render_template('auth/user_info_setup.html', user=user)
+
+        # 更新用户信息
+        result = user_model.update_user_profile(user['id'], data)
+
+        if result['success']:
+            # 更新session中的用户信息
+            session['profile_completed'] = True
+
+            if request.is_json:
+                return jsonify({
+                    'success': True,
+                    'message': '个人信息设置成功',
+                    'daily_calorie_goal': result.get('daily_calorie_goal')
+                })
+            else:
+                flash('个人信息设置成功', 'success')
+                return redirect(url_for('index'))
+        else:
+            if request.is_json:
+                return jsonify(result), 400
+            else:
+                flash(result['error'], 'error')
+                return render_template('auth/user_info_setup.html', user=user)
 
     return auth_bp

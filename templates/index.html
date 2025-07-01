@@ -22,7 +22,8 @@
                 <div class="user-menu">
                     {% if user %}
                         <div class="user-info">
-                            <span class="username">{{ user.username }}</span>
+                            <span class="username">{{ user.profile.nickname if user.profile and user.profile.nickname else user.username }}</span>
+                            <a href="/user-center" class="user-center-link">个人中心</a>
                             {% if user.is_admin %}
                                 <a href="/admin" class="admin-link">管理后台</a>
                             {% endif %}
@@ -36,6 +37,42 @@
 
         <!-- 主要内容区域 -->
         <main class="main-content">
+            <!-- 热量仪表盘 -->
+            <div class="card calorie-dashboard" id="calorieDashboard">
+                <div class="dashboard-header">
+                    <h2>今日热量摄入</h2>
+                    <div class="dashboard-date" id="dashboardDate"></div>
+                </div>
+
+                <div class="calorie-chart-container">
+                    <div class="calorie-chart">
+                        <svg viewBox="0 0 200 200" class="circular-chart">
+                            <circle class="circle-bg" cx="100" cy="100" r="80"></circle>
+                            <circle class="circle-progress" cx="100" cy="100" r="80" id="calorieProgress"></circle>
+                        </svg>
+                        <div class="chart-center">
+                            <div class="current-calories" id="currentCalories">0</div>
+                            <div class="calories-unit">kcal</div>
+                        </div>
+                    </div>
+
+                    <div class="calorie-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">目标</div>
+                            <div class="stat-value" id="targetCalories">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">剩余</div>
+                            <div class="stat-value" id="remainingCalories">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">进度</div>
+                            <div class="stat-value" id="calorieProgress">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 上传卡片 -->
             <div class="card upload-card" id="uploadCard">
                 <section id="uploadArea" class="upload-area">
