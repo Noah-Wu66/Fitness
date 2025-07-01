@@ -185,7 +185,7 @@ def too_large(e):
 ADMIN_REGISTRATION_KEY = 'H7jK9mN2pQ5rS8tU1vW4xY7zA0bC3dF6gH9jK2mN5pQ8rS1tU4vW7xY0zA3bC6dF'
 
 # 应用启动时的初始化
-@app.before_first_request
+@app.before_serving
 def initialize_app():
     """应用初始化"""
     try:

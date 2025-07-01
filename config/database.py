@@ -24,6 +24,20 @@ class DatabaseConfig:
         # 构建连接URI
         if mongo_username and mongo_password:
             uri = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
+            
+            # 处理可选的 authSource 与其他参数
+            query_params = []
+            mongo_auth_source = os.getenv('MONGO_AUTH_SOURCE')  # 认证数据库，常见为 admin
+            if mongo_auth_source:
+                query_params.append(f"authSource={mongo_auth_source}")
+            # 允许通过 MONGO_OPTIONS 追加其它自定义参数，如 retryWrites=true&w=majority
+            mongo_extra_opts = os.getenv('MONGO_OPTIONS')
+            if mongo_extra_opts:
+                # 支持用分号或逗号分隔的键值对列表
+                cleaned_opts = mongo_extra_opts.replace(';', '&').replace(',', '&')
+                query_params.append(cleaned_opts)
+            if query_params:
+                uri += '?' + '&'.join(query_params)
         else:
             uri = f"mongodb://{mongo_host}:{mongo_port}/{mongo_db}"
 
