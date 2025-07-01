@@ -193,11 +193,9 @@ def initialize_app():
     except Exception as e:
         print(f"应用初始化时出错: {e}")
 
-# 兼容 Flask <2.3 与 >=2.3/3.0 的事件钩子
-if hasattr(app, "before_serving"):
-    app.before_serving(initialize_app)  # Flask 2.3+
-else:
-    app.before_first_request(initialize_app)  # 旧版本 Flask
+# 应用启动时初始化
+with app.app_context():
+    initialize_app()
 
 if __name__ == '__main__':
     # 检查环境变量
