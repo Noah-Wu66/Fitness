@@ -184,8 +184,6 @@ def too_large(e):
 # 内置管理员注册密钥
 ADMIN_REGISTRATION_KEY = 'H7jK9mN2pQ5rS8tU1vW4xY7zA0bC3dF6gH9jK2mN5pQ8rS1tU4vW7xY0zA3bC6dF'
 
-# 应用启动时的初始化
-@app.before_serving
 def initialize_app():
     """应用初始化"""
     try:
@@ -194,6 +192,12 @@ def initialize_app():
         print("✓ 管理员注册密钥已内置")
     except Exception as e:
         print(f"应用初始化时出错: {e}")
+
+# 兼容 Flask <2.3 与 >=2.3/3.0 的事件钩子
+if hasattr(app, "before_serving"):
+    app.before_serving(initialize_app)  # Flask 2.3+
+else:
+    app.before_first_request(initialize_app)  # 旧版本 Flask
 
 if __name__ == '__main__':
     # 检查环境变量
