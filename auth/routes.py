@@ -205,14 +205,29 @@ def create_auth_blueprint(mongo):
 
         # 转换数值类型
         try:
-            if 'age' in data:
+            if 'age' in data and data['age']:
                 data['age'] = int(data['age'])
-            if 'height' in data:
+            if 'height' in data and data['height']:
                 data['height'] = float(data['height'])
-            if 'weight' in data:
+            if 'weight' in data and data['weight']:
                 data['weight'] = float(data['weight'])
             if 'target_weight' in data and data['target_weight']:
                 data['target_weight'] = float(data['target_weight'])
+            else:
+                # 如果目标体重为空，设置为None
+                data['target_weight'] = None
+
+            # 确保必填字段不为空
+            required_fields = ['nickname', 'gender', 'age', 'height', 'weight']
+            for field in required_fields:
+                if field not in data or not data[field]:
+                    error_msg = f'请填写{field}'
+                    if request.is_json:
+                        return jsonify({'success': False, 'error': error_msg}), 400
+                    else:
+                        flash(error_msg, 'error')
+                        return render_template('auth/user_info_setup.html', user=user)
+
         except ValueError:
             error_msg = '请输入有效的数值'
             if request.is_json:
@@ -227,6 +242,14 @@ def create_auth_blueprint(mongo):
         if result['success']:
             # 更新session中的用户信息
             session['profile_completed'] = True
+            session['profile'] = data  # 更新profile数据
+
+            # 为了确保数据一致性，重新从数据库获取用户信息
+            updated_user = user_model.get_user_by_id(user['id'])
+
+            if updated_user:
+                session['profile'] = updated_user.get('profile', {})
+                session['profile_completed'] = updated_user.get('profile_completed', False)
 
             if request.is_json:
                 return jsonify({

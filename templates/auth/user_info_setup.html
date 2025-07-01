@@ -268,9 +268,24 @@
             spinner.style.display = 'inline-block';
             submitBtn.disabled = true;
             
-            // 提交表单数据
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
+            // 提交表单数据 - 手动收集所有字段，包括隐藏的
+            const data = {};
+
+            // 收集所有input和select字段
+            const inputs = this.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.name) {
+                    if (input.type === 'radio') {
+                        if (input.checked) {
+                            data[input.name] = input.value;
+                        }
+                    } else {
+                        data[input.name] = input.value;
+                    }
+                }
+            });
+
+            // console.log('DEBUG: 收集的表单数据:', data);
             
             fetch('/auth/setup-profile', {
                 method: 'POST',

@@ -39,7 +39,9 @@ def get_current_user():
             'id': session['user_id'],
             'username': session.get('username'),
             'email': session.get('email'),
-            'is_admin': session.get('is_admin', False)
+            'is_admin': session.get('is_admin', False),
+            'profile': session.get('profile', {}),
+            'profile_completed': session.get('profile_completed', False)
         }
     return None
 
@@ -49,6 +51,8 @@ def login_user(user_data):
     session['username'] = user_data['username']
     session['email'] = user_data['email']
     session['is_admin'] = user_data.get('is_admin', False)
+    session['profile'] = user_data.get('profile', {})
+    session['profile_completed'] = user_data.get('profile_completed', False)
     session.permanent = True
 
 def logout_user():
