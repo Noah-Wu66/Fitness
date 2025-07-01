@@ -55,9 +55,21 @@
 
 #### 1. 数据库连接字符串（必需）
 ```
-MONGODB_URI=mongodb://username:password@host:port/database
+MONGODB_URI=mongodb://username:password@host:port
 ```
-*Zeabur MongoDB服务会自动生成此变量*
+
+**常见范例：**
+- **Zeabur原始连接**：`mongodb://mongo:password@hkg1.clusters.zeabur.com:30826`
+- **MongoDB Atlas**：`mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/fitness_app?retryWrites=true&w=majority`
+- **Railway插件**：`mongodb://mongo:password@containers-us-west-1.railway.app:27017`
+- **本地MongoDB**：`mongodb://localhost:27017`
+
+**✨ 智能特性：**
+- 可以直接使用云平台提供的原始连接字符串
+- 系统会自动添加默认数据库名 `fitness_app`
+- 如果连接字符串已包含数据库名，保持不变
+
+*注意：Zeabur等云平台会自动生成此变量，直接使用即可*
 
 #### 2. Gemini AI API密钥（必需）
 ```
@@ -70,6 +82,61 @@ GEMINI_BASE_URL=https://aihubmix.com/gemini
 ```
 
 **注意：** 应用密钥和管理员注册密钥已内置到代码中，无需配置。
+
+## MONGODB_URI 详细配置指南
+
+### 格式说明
+```
+mongodb://[username:password@]host[:port][/database][?options]
+```
+**注意：** 数据库名是可选的，系统会自动添加默认数据库名 `fitness_app`
+
+### 各云平台获取方法
+
+#### 🔵 Zeabur（推荐）
+1. 在项目中点击"Add Service" → "Database" → "MongoDB"
+2. MongoDB服务启动后，系统自动生成 `MONGODB_URI`
+3. 在Web应用环境变量中自动出现，格式如：
+   ```
+   mongodb://mongo:randompassword@hkg1.clusters.zeabur.com:30826
+   ```
+4. **直接使用即可**，系统会自动添加数据库名 `fitness_app`
+
+#### 🟢 Railway
+1. 添加MongoDB插件
+2. 插件自动生成连接字符串，格式如：
+   ```
+   mongodb://mongo:password@containers-us-west-1.railway.app:27017/railway
+   ```
+
+#### 🟣 MongoDB Atlas（适用于任何平台）
+1. 注册 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)（有免费套餐）
+2. 创建集群并获取连接字符串：
+   ```
+   mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/fitness_app?retryWrites=true&w=majority
+   ```
+3. 将此字符串配置到任何云平台的环境变量中
+
+#### 🔴 Render
+1. 创建MongoDB数据库服务或连接外部MongoDB
+2. 获取连接字符串并配置到环境变量
+
+### 连接字符串组成部分
+- **协议**：`mongodb://` 或 `mongodb+srv://`（Atlas使用）
+- **认证**：`username:password@`（如果需要认证）
+- **主机**：`host:port`（服务器地址和端口）
+- **数据库**：`/database_name`（可选，系统会自动添加 `fitness_app`）
+- **选项**：`?retryWrites=true&w=majority`（可选参数）
+
+### 🎯 推荐做法
+**直接使用云平台提供的原始连接字符串**，例如：
+```
+# Zeabur提供的原始连接字符串
+MONGODB_URI=mongodb://mongo:pZtU5lg1qv9jA7XLR280MwG4xVYPz36C@hkg1.clusters.zeabur.com:30826
+
+# 系统会自动转换为：
+# mongodb://mongo:pZtU5lg1qv9jA7XLR280MwG4xVYPz36C@hkg1.clusters.zeabur.com:30826/fitness_app
+```
 
 4. **部署应用**
    - 配置完成后，Zeabur会自动部署应用

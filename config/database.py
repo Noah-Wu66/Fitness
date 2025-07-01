@@ -11,7 +11,8 @@ class DatabaseConfig:
         # 优先使用完整的连接字符串
         mongodb_uri = os.getenv('MONGODB_URI') or os.getenv('DATABASE_URL')
         if mongodb_uri:
-            return mongodb_uri
+            # 检查连接字符串是否包含数据库名
+            return DatabaseConfig._ensure_database_name(mongodb_uri)
 
         # 回退到分离式配置
         mongo_host = os.getenv('MONGO_HOST', 'localhost')
@@ -27,6 +28,43 @@ class DatabaseConfig:
             uri = f"mongodb://{mongo_host}:{mongo_port}/{mongo_db}"
 
         return uri
+
+    @staticmethod
+    def _ensure_database_name(mongodb_uri, default_db='fitness_app'):
+        """确保MongoDB连接字符串包含数据库名"""
+        try:
+            # 解析连接字符串
+            if '?' in mongodb_uri:
+                # 处理包含查询参数的情况
+                base_uri, query_params = mongodb_uri.split('?', 1)
+                query_suffix = f'?{query_params}'
+            else:
+                base_uri = mongodb_uri
+                query_suffix = ''
+
+            # 检查是否已包含数据库名
+            # 格式：mongodb://user:pass@host:port/database 或 mongodb+srv://user:pass@host/database
+            if base_uri.count('/') >= 3:
+                # 已包含数据库名，检查是否为空
+                parts = base_uri.split('/')
+                if len(parts) > 3 and parts[3].strip():
+                    # 数据库名不为空，返回原字符串
+                    return mongodb_uri
+                else:
+                    # 数据库名为空，替换为默认数据库名
+                    parts[3] = default_db
+                    return '/'.join(parts) + query_suffix
+            else:
+                # 不包含数据库名，添加默认数据库名
+                return f"{base_uri}/{default_db}{query_suffix}"
+
+        except Exception as e:
+            # 解析失败时，尝试简单添加数据库名
+            print(f"警告: MongoDB URI解析失败，使用简单方式添加数据库名: {e}")
+            if mongodb_uri.endswith('/'):
+                return f"{mongodb_uri}{default_db}"
+            else:
+                return f"{mongodb_uri}/{default_db}"
     
     @staticmethod
     def init_app(app):
