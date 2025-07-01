@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户详情 - {{ user.username }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        
+        .user-header {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .user-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .user-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .user-badges {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-admin {
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+        
+        .badge-active {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+        
+        .badge-inactive {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+        
+        .user-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .actions-card {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .actions-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-toggle {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-toggle:hover {
+            background: #D97706;
+        }
+        
+        .btn-delete {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 16px;
+            }
+            
+            .user-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="{{ url_for('admin.users') }}" class="back-link">
+            ← 返回用户列表
+        </a>
+        
+        <div class="user-header">
+            <div class="user-title">
+                <h1>{{ user.username }}</h1>
+                <div class="user-badges">
+                    {% if user.is_admin %}
+                        <span class="badge badge-admin">管理员</span>
+                    {% endif %}
+                    <span class="badge {{ 'badge-active' if user.is_active else 'badge-inactive' }}">
+                        {{ '正常' if user.is_active else '已禁用' }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="user-info-grid">
+                <div class="info-item">
+                    <span class="info-label">邮箱</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">注册时间</span>
+                    <span class="info-value">{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else '未知' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">用户ID</span>
+                    <span class="info-value">{{ user.id }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ statistics.get('total_analyses', 0) }}</div>
+                <div class="stat-label">总分析次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ statistics.get('recent_analyses', 0) }}</div>
+                <div class="stat-label">最近30天分析</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ statistics.get('token_usage', {}).get('total_tokens', 0) }}</div>
+                <div class="stat-label">总Token使用量</div>
+            </div>
+        </div>
+        
+        {% if not user.is_admin %}
+        <div class="actions-card">
+            <h3 class="actions-title">用户操作</h3>
+            <div class="action-buttons">
+                <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" style="display: inline;">
+                    <button type="submit" class="action-btn btn-toggle">
+                        {{ '禁用账号' if user.is_active else '启用账号' }}
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" 
+                      style="display: inline;" 
+                      onsubmit="return confirm('确定要删除用户 {{ user.username }} 吗？此操作将删除用户的所有数据且不可撤销。')">
+                    <button type="submit" class="action-btn btn-delete">删除用户</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

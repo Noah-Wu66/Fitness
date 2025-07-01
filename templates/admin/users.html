@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 管理后台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .page-header {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .users-table {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--background);
+        }
+        
+        .table-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .users-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+        
+        .user-item:hover {
+            background: var(--background);
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .user-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 16px;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+        
+        .status-inactive {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+        
+        .status-admin {
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-view {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: var(--primary-hover);
+        }
+        
+        .btn-toggle {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-toggle:hover {
+            background: #D97706;
+        }
+        
+        .btn-delete {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+        
+        .pagination {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .pagination a, .pagination span {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .pagination a {
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .pagination a:hover {
+            background: var(--primary-light);
+        }
+        
+        .pagination .current {
+            background: var(--primary-color);
+            color: white;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        
+        .back-link:hover {
+            color: var(--primary-hover);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 16px;
+            }
+            
+            .user-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="{{ url_for('admin.dashboard') }}" class="back-link">
+            ← 返回管理后台
+        </a>
+        
+        <div class="page-header">
+            <h1>用户管理</h1>
+            <p>管理系统中的所有用户账号</p>
+        </div>
+        
+        <div class="users-table">
+            <div class="table-header">
+                <h3>用户列表 (共 {{ total }} 个用户)</h3>
+            </div>
+            
+            {% if users %}
+                <div class="users-list">
+                    {% for user in users %}
+                    <div class="user-item">
+                        <div class="user-info">
+                            <div class="user-name">{{ user.username }}</div>
+                            <div class="user-email">{{ user.email }}</div>
+                            <div class="user-meta">
+                                <span>注册时间: {{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '未知' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="user-status">
+                            {% if user.is_admin %}
+                                <span class="status-badge status-admin">管理员</span>
+                            {% endif %}
+                            <span class="status-badge {{ 'status-active' if user.is_active else 'status-inactive' }}">
+                                {{ '正常' if user.is_active else '已禁用' }}
+                            </span>
+                        </div>
+                        
+                        <div class="user-actions">
+                            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="action-btn btn-view">查看</a>
+                            {% if not user.is_admin %}
+                                <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" style="display: inline;">
+                                    <button type="submit" class="action-btn btn-toggle">
+                                        {{ '禁用' if user.is_active else '启用' }}
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('确定要删除用户 {{ user.username }} 吗？此操作不可撤销。')">
+                                    <button type="submit" class="action-btn btn-delete">删除</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if total_pages > 1 %}
+                <div class="pagination">
+                    {% if page > 1 %}
+                        <a href="?page={{ page - 1 }}">上一页</a>
+                    {% endif %}
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                            <span class="current">{{ p }}</span>
+                        {% else %}
+                            <a href="?page={{ p }}">{{ p }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                        <a href="?page={{ page + 1 }}">下一页</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <p>暂无用户数据</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

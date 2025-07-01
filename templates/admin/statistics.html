@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统统计 - 管理后台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .page-header {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .stat-description {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        
+        .user-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .mini-stat-card {
+            background: var(--card-background);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .mini-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .mini-stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .total-users .mini-stat-value {
+            color: var(--primary-color);
+        }
+        
+        .active-users .mini-stat-value {
+            color: var(--success-color);
+        }
+        
+        .inactive-users .mini-stat-value {
+            color: var(--error-color);
+        }
+        
+        .admin-users .mini-stat-value {
+            color: var(--secondary-color);
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        
+        .back-link:hover {
+            color: var(--primary-hover);
+        }
+        
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 16px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .user-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="{{ url_for('admin.dashboard') }}" class="back-link">
+            ← 返回管理后台
+        </a>
+        
+        <div class="page-header">
+            <h1>系统统计</h1>
+            <p>查看系统使用情况和统计数据</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value">{{ statistics.analyses.total }}</div>
+                <div class="stat-label">总分析次数</div>
+                <div class="stat-description">系统累计处理的图片分析次数</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-value">{{ statistics.analyses.recent_30_days }}</div>
+                <div class="stat-label">最近30天分析</div>
+                <div class="stat-description">近期系统活跃度指标</div>
+            </div>
+        </div>
+        
+        <h2 class="section-title">用户统计</h2>
+        <div class="user-stats-grid">
+            <div class="mini-stat-card total-users">
+                <div class="mini-stat-value">{{ statistics.users.total }}</div>
+                <div class="mini-stat-label">总用户数</div>
+            </div>
+            
+            <div class="mini-stat-card active-users">
+                <div class="mini-stat-value">{{ statistics.users.active }}</div>
+                <div class="mini-stat-label">活跃用户</div>
+            </div>
+            
+            <div class="mini-stat-card inactive-users">
+                <div class="mini-stat-value">{{ statistics.users.inactive }}</div>
+                <div class="mini-stat-label">已禁用用户</div>
+            </div>
+            
+            <div class="mini-stat-card admin-users">
+                <div class="mini-stat-value">{{ statistics.users.admin }}</div>
+                <div class="mini-stat-label">管理员</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

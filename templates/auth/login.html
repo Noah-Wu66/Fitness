@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 智能卡路里分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-light), var(--background));
+        }
+        
+        .auth-card {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 48px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .auth-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: var(--card-background);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+        
+        .auth-btn:hover {
+            background: var(--primary-hover);
+        }
+        
+        .auth-btn:disabled {
+            background: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+        
+        .auth-links {
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .auth-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-error {
+            background: #FEF2F2;
+            color: #DC2626;
+            border: 1px solid #FECACA;
+        }
+        
+        .alert-success {
+            background: #F0FDF4;
+            color: #16A34A;
+            border: 1px solid #BBF7D0;
+        }
+        
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 32px 24px;
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>用户登录</h1>
+                <p>登录您的账号以继续使用智能卡路里分析</p>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" id="loginForm">
+                <div class="form-group">
+                    <label for="login_identifier" class="form-label">用户名或邮箱</label>
+                    <input type="text" id="login_identifier" name="login_identifier" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="auth-btn" id="loginBtn">
+                    <span class="btn-text">登录</span>
+                </button>
+            </form>
+            
+            <div class="auth-links">
+                <p>还没有账号？ <a href="{{ url_for('auth.register') }}">立即注册</a></p>
+                <p>需要管理员权限？ <a href="{{ url_for('auth.admin_register') }}">管理员注册</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('loginBtn');
+            const btnText = btn.querySelector('.btn-text');
+            
+            btn.disabled = true;
+            btnText.textContent = '登录中...';
+            
+            // 如果表单验证失败，重新启用按钮
+            setTimeout(() => {
+                if (!this.checkValidity()) {
+                    btn.disabled = false;
+                    btnText.textContent = '登录';
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

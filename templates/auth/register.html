@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 智能卡路里分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-light), var(--background));
+            padding: 20px 0;
+        }
+        
+        .auth-card {
+            background: var(--card-background);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 48px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .auth-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: var(--card-background);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: var(--error-color);
+        }
+        
+        .form-error {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+        
+        .auth-btn:hover {
+            background: var(--primary-hover);
+        }
+        
+        .auth-btn:disabled {
+            background: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+        
+        .auth-links {
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .auth-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-error {
+            background: #FEF2F2;
+            color: #DC2626;
+            border: 1px solid #FECACA;
+        }
+        
+        .alert-success {
+            background: #F0FDF4;
+            color: #16A34A;
+            border: 1px solid #BBF7D0;
+        }
+        
+        .password-requirements {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 32px 24px;
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>用户注册</h1>
+                <p>创建您的账号以开始使用智能卡路里分析</p>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" id="registerForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名</label>
+                    <input type="text" id="username" name="username" class="form-input" required 
+                           minlength="3" maxlength="20" pattern="[a-zA-Z0-9_\u4e00-\u9fa5]+">
+                    <div class="form-error" id="usernameError">用户名长度3-20个字符，只能包含字母、数字、下划线和中文</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">邮箱</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                    <div class="form-error" id="emailError">请输入有效的邮箱地址</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" id="password" name="password" class="form-input" required 
+                           minlength="6" maxlength="128">
+                    <div class="password-requirements">密码长度至少6个字符</div>
+                    <div class="form-error" id="passwordError">密码长度至少6个字符</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">确认密码</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-input" required>
+                    <div class="form-error" id="confirmPasswordError">两次输入的密码不一致</div>
+                </div>
+                
+                <button type="submit" class="auth-btn" id="registerBtn">
+                    <span class="btn-text">注册</span>
+                </button>
+            </form>
+            
+            <div class="auth-links">
+                <p>已有账号？ <a href="{{ url_for('auth.login') }}">立即登录</a></p>
+                <p>需要管理员权限？ <a href="{{ url_for('auth.admin_register') }}">管理员注册</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('registerForm');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const registerBtn = document.getElementById('registerBtn');
+        
+        // 实时验证
+        function validateField(input, errorElement, validationFn) {
+            input.addEventListener('blur', function() {
+                const isValid = validationFn(this.value);
+                if (!isValid) {
+                    this.classList.add('error');
+                    errorElement.style.display = 'block';
+                } else {
+                    this.classList.remove('error');
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    const isValid = validationFn(this.value);
+                    if (isValid) {
+                        this.classList.remove('error');
+                        errorElement.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // 用户名验证
+        validateField(usernameInput, document.getElementById('usernameError'), function(value) {
+            return value.length >= 3 && value.length <= 20 && /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(value);
+        });
+        
+        // 邮箱验证
+        validateField(emailInput, document.getElementById('emailError'), function(value) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        });
+        
+        // 密码验证
+        validateField(passwordInput, document.getElementById('passwordError'), function(value) {
+            return value.length >= 6;
+        });
+        
+        // 确认密码验证
+        validateField(confirmPasswordInput, document.getElementById('confirmPasswordError'), function(value) {
+            return value === passwordInput.value;
+        });
+        
+        // 表单提交
+        form.addEventListener('submit', function(e) {
+            const btnText = registerBtn.querySelector('.btn-text');
+            
+            registerBtn.disabled = true;
+            btnText.textContent = '注册中...';
+            
+            // 如果表单验证失败，重新启用按钮
+            setTimeout(() => {
+                if (!this.checkValidity() || passwordInput.value !== confirmPasswordInput.value) {
+                    registerBtn.disabled = false;
+                    btnText.textContent = '注册';
+                    
+                    if (passwordInput.value !== confirmPasswordInput.value) {
+                        e.preventDefault();
+                        confirmPasswordInput.classList.add('error');
+                        document.getElementById('confirmPasswordError').style.display = 'block';
+                    }
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

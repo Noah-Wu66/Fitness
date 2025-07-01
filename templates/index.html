@@ -14,9 +14,22 @@
     <div class="container">
         <!-- 头部区域 -->
         <header class="header">
-            <div class="logo">
-                <div class="logo-icon">🍎</div>
-                <h1>智能卡路里分析</h1>
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-icon">🍎</div>
+                    <h1>智能卡路里分析</h1>
+                </div>
+                <div class="user-menu">
+                    {% if user %}
+                        <div class="user-info">
+                            <span class="username">{{ user.username }}</span>
+                            {% if user.is_admin %}
+                                <a href="/admin" class="admin-link">管理后台</a>
+                            {% endif %}
+                            <button id="logoutBtn" class="logout-btn">退出</button>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
             <p class="subtitle">基于AI视觉技术，精准识别食物并分析营养成分</p>
         </header>

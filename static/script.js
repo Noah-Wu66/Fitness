@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let selectedFile = null;
     let historyVisible = false;
-    const HISTORY_KEY = 'calorie_analyzer_history';
+
+    // 用户认证相关
+    const logoutBtn = document.getElementById('logoutBtn');
 
     // 点击上传区域
     uploadArea.addEventListener('click', () => {
@@ -69,8 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
     historyToggleBtn.addEventListener('click', toggleHistory);
     clearHistoryBtn.addEventListener('click', clearAllHistory);
 
+    // 退出登录按钮点击
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
+
     // 初始化历史记录
-    loadHistory();
+    loadHistoryFromServer();
 
     function handleFileSelect(e) {
         const file = e.target.files[0];
@@ -145,9 +152,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             setLoading(false);
             console.error('Error:', error);
+
+            // 检查是否是认证错误
+            if (String(error).includes('HTTP 401')) {
+                showError('登录已过期，请重新登录');
+                setTimeout(() => {
+                    window.location.href = '/auth/login';
+                }, 2000);
+                return;
+            }
+
             // 根据错误信息判断是否是网关或网络错误
             if (String(error).includes('HTTP 502')) {
                 showError('服务器超时或暂不可用，请稍后再试');
+            } else if (String(error).includes('HTTP 403')) {
+                showError('权限不足，请联系管理员');
             } else {
                 showError('网络错误，请检查网络连接后重试');
             }
@@ -179,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resultCard.style.display = 'block';
         errorCard.style.display = 'none';
         
-        saveToHistory(analysis, usage);
+        saveToServer(analysis, usage);
         
         resultCard.scrollIntoView({ behavior: 'smooth' });
     }
@@ -303,42 +322,89 @@ document.addEventListener('DOMContentLoaded', function() {
         errorCard.style.display = 'none';
     }
 
-    function saveToHistory(analysis, usage) {
+    // 用户认证相关函数
+    function logout() {
+        if (confirm('确定要退出登录吗？')) {
+            fetch('/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/auth/login';
+                } else {
+                    alert('退出登录失败');
+                }
+            })
+            .catch(error => {
+                console.error('退出登录错误:', error);
+                alert('退出登录失败');
+            });
+        }
+    }
+
+    // 保存到服务器
+    function saveToServer(analysis, usage) {
         if (!selectedFile) return;
 
-        const historyItem = {
-            id: Date.now(),
-            date: new Date().toLocaleString('zh-CN'),
-            imageData: previewImg.src,
-            analysis: analysis,
-            usage: usage
+        const data = {
+            image_data: previewImg.src,
+            analysis_result: analysis,
+            usage_info: usage
         };
 
-        const history = getHistory();
-        history.unshift(historyItem);
-
-        // 只保留最近50条记录
-        if (history.length > 50) {
-            history.splice(50);
-        }
-
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-        loadHistory();
+        fetch('/api/history/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('历史记录保存成功');
+                loadHistoryFromServer();
+            } else {
+                console.error('保存历史记录失败:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('保存历史记录错误:', error);
+        });
     }
 
-    function getHistory() {
-        try {
-            const history = localStorage.getItem(HISTORY_KEY);
-            return history ? JSON.parse(history) : [];
-        } catch (error) {
-            console.error('Failed to load history:', error);
-            return [];
-        }
+    // 从服务器加载历史记录
+    function loadHistoryFromServer() {
+        fetch('/api/history/')
+        .then(response => {
+            if (response.status === 401) {
+                // 认证失败，重定向到登录页
+                window.location.href = '/auth/login';
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                displayHistory(data.history);
+            } else if (data) {
+                console.error('加载历史记录失败:', data.error);
+                historyEmpty.style.display = 'block';
+                historyList.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('加载历史记录错误:', error);
+            historyEmpty.style.display = 'block';
+            historyList.style.display = 'none';
+        });
     }
 
-    function loadHistory() {
-        const history = getHistory();
-        
+    function displayHistory(history) {
         if (history.length === 0) {
             historyEmpty.style.display = 'block';
             historyList.style.display = 'none';
@@ -358,16 +424,20 @@ document.addEventListener('DOMContentLoaded', function() {
     function createHistoryItemElement(item) {
         const li = document.createElement('li');
         li.className = 'history-item';
+
+        // 格式化日期
+        const date = item.created_at ? new Date(item.created_at).toLocaleString('zh-CN') : '未知时间';
+
         li.innerHTML = `
             <div class="history-item-header">
-                <span class="history-date">${item.date}</span>
-                <button class="history-delete" onclick="deleteHistoryItem(${item.id})">删除</button>
+                <span class="history-date">${date}</span>
+                <button class="history-delete" onclick="deleteHistoryItemFromServer('${item.id}')">删除</button>
             </div>
             <div class="history-image-container">
-                <img src="${item.imageData}" alt="历史图片" class="history-image" onclick="showImageModal('${item.imageData}')">
+                <img src="${item.image_data}" alt="历史图片" class="history-image" onclick="showImageModal('${item.image_data}')">
             </div>
-            <div class="history-result">${item.analysis}</div>
-            <div class="history-usage">Token: ${item.usage.total_tokens} (输入: ${item.usage.prompt_tokens}, 输出: ${item.usage.completion_tokens})</div>
+            <div class="history-result">${item.analysis_result}</div>
+            <div class="history-usage">Token: ${item.usage_info.total_tokens} (输入: ${item.usage_info.prompt_tokens}, 输出: ${item.usage_info.completion_tokens})</div>
         `;
         return li;
     }
@@ -391,17 +461,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function clearAllHistory() {
         if (confirm('确定要清空所有历史记录吗？此操作不可撤销。')) {
-            localStorage.removeItem(HISTORY_KEY);
-            loadHistory();
+            fetch('/api/history/clear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadHistoryFromServer();
+                    alert('历史记录已清空');
+                } else {
+                    alert('清空失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('清空历史记录错误:', error);
+                alert('清空失败');
+            });
         }
     }
 
     // 全局函数，供HTML调用
-    window.deleteHistoryItem = function(id) {
-        const history = getHistory();
-        const filteredHistory = history.filter(item => item.id !== id);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(filteredHistory));
-        loadHistory();
+    window.deleteHistoryItemFromServer = function(id) {
+        if (confirm('确定要删除这条记录吗？')) {
+            fetch(`/api/history/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadHistoryFromServer();
+                } else {
+                    alert('删除失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('删除历史记录错误:', error);
+                alert('删除失败');
+            });
+        }
     };
 
     window.showImageModal = function(imageSrc) {

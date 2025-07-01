@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -7,11 +8,36 @@ import base64
 from PIL import Image
 import io
 
+# 导入自定义模块
+from config.database import DatabaseConfig
+from models.user import User
+from models.history import History
+from auth.routes import create_auth_blueprint
+from admin.routes import create_admin_blueprint
+from api.history import create_history_blueprint
+from auth.auth import login_required, get_current_user
+
 # 加载环境变量
 load_dotenv()
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB 最大文件大小
+
+# Session配置 - 使用内置密钥
+app.config['SECRET_KEY'] = 'K8mN9pQ2rS5tU7vW0xY3zA6bC9dF2gH5jK8mN1pQ4rS7tU0vW3xY6zA9bC2dF5gH'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+
+# 初始化数据库
+mongo = DatabaseConfig.init_app(app)
+
+# 初始化模型
+user_model = User(mongo)
+history_model = History(mongo)
+
+# 注册蓝图
+app.register_blueprint(create_auth_blueprint(mongo))
+app.register_blueprint(create_admin_blueprint(mongo))
+app.register_blueprint(create_history_blueprint(mongo))
 
 # 初始化Gemini客户端
 client = genai.Client(
@@ -20,10 +46,13 @@ client = genai.Client(
 )
 
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    user = get_current_user()
+    return render_template('index.html', user=user)
 
 @app.route('/analyze', methods=['POST'])
+@login_required
 def analyze_calories():
     try:
         # 检查是否有文件上传
@@ -123,6 +152,21 @@ def analyze_calories():
             'total_tokens': response.usage_metadata.total_token_count
         }
         
+        # 保存到历史记录
+        user = get_current_user()
+        if user:
+            # 将图片转换为base64用于存储
+            image_base64 = base64.b64encode(file_bytes).decode('utf-8')
+            image_data_url = f"data:{mime_type};base64,{image_base64}"
+
+            # 保存历史记录
+            history_model.save_analysis(
+                user['id'],
+                image_data_url,
+                analysis_result,
+                usage_info
+            )
+
         return jsonify({
             'success': True,
             'analysis': analysis_result,
@@ -137,6 +181,20 @@ def analyze_calories():
 def too_large(e):
     return jsonify({'error': '文件过大，请上传小于20MB的图片'}), 413
 
+# 内置管理员注册密钥
+ADMIN_REGISTRATION_KEY = 'H7jK9mN2pQ5rS8tU1vW4xY7zA0bC3dF6gH9jK2mN5pQ8rS1tU4vW7xY0zA3bC6dF'
+
+# 应用启动时的初始化
+@app.before_first_request
+def initialize_app():
+    """应用初始化"""
+    try:
+        print("✓ 应用初始化完成")
+        print("✓ 超级管理员注册地址: /auth/admin-register")
+        print("✓ 管理员注册密钥已内置")
+    except Exception as e:
+        print(f"应用初始化时出错: {e}")
+
 if __name__ == '__main__':
     # 检查环境变量
     if not os.getenv('GEMINI_API_KEY'):
@@ -145,7 +203,7 @@ if __name__ == '__main__':
     if not os.getenv('GEMINI_BASE_URL'):
         print("错误: 请设置 GEMINI_BASE_URL 环境变量")
         exit(1)
-    
+
     # 根据部署环境动态选择端口，优先 PORT，其次 WEB_PORT，默认 5000
     run_port = int(os.getenv('PORT') or os.getenv('WEB_PORT') or "5000")
-    app.run(host='0.0.0.0', port=run_port) 
+    app.run(host='0.0.0.0', port=run_port)
